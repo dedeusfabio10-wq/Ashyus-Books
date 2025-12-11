@@ -30,11 +30,11 @@ const Footer: React.FC = () => {
 
         setLoading(true);
 
-        const apiKey = process.env.VITE_WEB3FORMS_ACCESS_KEY;
+        // Acesso corrigido para Vite
+        const apiKey = (import.meta as any).env.VITE_WEB3FORMS_ACCESS_KEY;
         
         if (!apiKey) {
-            // Fallback para simulação se não houver chave
-            console.warn("VITE_WEB3FORMS_ACCESS_KEY não definida. Simulando envio.");
+            console.warn("VITE_WEB3FORMS_ACCESS_KEY não definida.");
             setTimeout(() => {
                 setSubscribed(true);
                 setEmail('');

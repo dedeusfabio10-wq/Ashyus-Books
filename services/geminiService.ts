@@ -2,11 +2,7 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { Book } from '../types';
 
-if (!process.env.API_KEY) {
-  console.warn("API_KEY environment variable not set. Using a placeholder.");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "YOUR_API_KEY_HERE" });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 type GeneratedBookData = Omit<Book, 'id' | 'title' | 'books2readUrl' | 'coverUrl' | 'createdAt'>;
 
