@@ -1,4 +1,3 @@
-
 import React, { useState, useContext, FormEvent, ChangeEvent } from 'react';
 import { BookContext } from '../context/BookContext';
 import { ADMIN_USERNAME, ADMIN_PASSWORD } from '../constants';
@@ -27,6 +26,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
     const [amazonUrl, setAmazonUrl] = useState('');
+    const [coverImage, setCoverImage] = useState<string | null>(null);
     const [addError, setAddError] = useState('');
 
     // Banner State
@@ -65,6 +65,17 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
         }
     };
 
+    const handleBookCoverUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            try {
+                const base64 = await fileToBase64(e.target.files[0]);
+                setCoverImage(base64);
+            } catch (error) {
+                console.error("Erro ao processar imagem da capa", error);
+            }
+        }
+    }
+
     const handleAddBook = async (e: FormEvent) => {
         e.preventDefault();
         setAddError('');
@@ -73,10 +84,12 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
             return;
         }
         try {
-            await addBook(title, url, amazonUrl);
+            // Passa a imagem da capa (se houver) para a função addBook
+            await addBook(title, url, amazonUrl, coverImage || undefined);
             setTitle('');
             setUrl('');
             setAmazonUrl('');
+            setCoverImage(null);
             alert('Livro adicionado com sucesso!');
         } catch (error) {
             setAddError(error instanceof Error ? error.message : "Ocorreu um erro desconhecido.");
@@ -189,6 +202,12 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <input type="url" placeholder="Link Amazon (Opcional)" value={amazonUrl} onChange={e => setAmazonUrl(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" />
                                         <input type="url" placeholder="Link Books2Read (Multi-lojas)" value={url} onChange={e => setUrl(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-400 text-sm mb-1">Capa do Livro (Opcional)</label>
+                                        <input type="file" accept="image/*" onChange={handleBookCoverUpload} className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-brand-gold file:text-brand-dark hover:file:bg-brand-gold-dark"/>
+                                        <p className="text-xs text-gray-500 mt-1">Se não enviar, uma imagem aleatória será gerada.</p>
+                                        {coverImage && <img src={coverImage} alt="Preview" className="mt-2 h-24 object-contain border border-gray-600" />}
                                     </div>
                                     <p className="text-xs text-gray-500">O Books2Read agrega Kobo, Apple, Google e outras. A Amazon é bom ter separado.</p>
                                 </div>

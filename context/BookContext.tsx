@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Book, Banner, Release } from '../types';
 import { generateBookDetails } from '../services/geminiService';
@@ -11,7 +10,7 @@ interface BookContextType {
     authorPhoto: string;
     loading: boolean;
     error: string | null;
-    addBook: (title: string, books2readUrl: string, amazonUrl?: string) => Promise<void>;
+    addBook: (title: string, books2readUrl: string, amazonUrl?: string, coverBase64?: string) => Promise<void>;
     updateBookCover: (bookId: string, newCoverUrl: string) => Promise<void>;
     addBanner: (imageUrl: string, linkUrl: string, position: 'left' | 'right') => Promise<void>;
     removeBanner: (bannerId: string) => Promise<void>;
@@ -143,13 +142,16 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         initializeData();
     }, [initializeData]);
 
-    const addBook = async (title: string, books2readUrl: string, amazonUrl?: string) => {
+    const addBook = async (title: string, books2readUrl: string, amazonUrl?: string, coverBase64?: string) => {
         setLoading(true);
         setError(null);
         try {
             const id = Date.now().toString();
             const details = await generateBookDetails(title);
             
+            // Usa a imagem enviada ou gera um placeholder
+            const finalCoverUrl = coverBase64 || `https://picsum.photos/seed/${id}/800/1200`;
+
             // Se Supabase estiver ativo, salva lá
             if (supabase) {
                 const { error: dbError } = await supabase.from('books').insert([{
@@ -157,7 +159,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     title: title,
                     books2read_url: books2readUrl,
                     amazon_url: amazonUrl,
-                    cover_url: `https://picsum.photos/seed/${id}/800/1200`, // Placeholder inicial
+                    cover_url: finalCoverUrl,
                     short_synopsis: details.shortSynopsis,
                     full_synopsis: details.fullSynopsis,
                     first_chapter_markdown: details.firstChapterMarkdown
@@ -174,7 +176,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 title,
                 books2readUrl,
                 amazonUrl,
-                coverUrl: `https://picsum.photos/seed/${id}/800/1200`,
+                coverUrl: finalCoverUrl,
                 createdAt: new Date().toISOString(),
             };
 
