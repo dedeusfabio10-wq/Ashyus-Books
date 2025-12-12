@@ -30,8 +30,19 @@ const Footer: React.FC = () => {
 
         setLoading(true);
 
-        // Acesso corrigido para Vite
-        const apiKey = (import.meta as any).env.VITE_WEB3FORMS_ACCESS_KEY;
+        // Acesso seguro à chave
+        let apiKey = '';
+        try {
+            apiKey = (import.meta as any).env?.VITE_WEB3FORMS_ACCESS_KEY;
+        } catch (e) {}
+
+        if (!apiKey) {
+             try {
+                if (typeof process !== 'undefined' && process.env) {
+                    apiKey = process.env.VITE_WEB3FORMS_ACCESS_KEY || '';
+                }
+             } catch(e) {}
+        }
         
         if (!apiKey) {
             console.warn("VITE_WEB3FORMS_ACCESS_KEY não definida.");

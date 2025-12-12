@@ -2,20 +2,50 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { Book } from '../types';
 
-// CORREÇÃO CRÍTICA PARA VERCEL:
-// O navegador não possui "process.env". Usamos "import.meta.env" no Vite.
-// Certifique-se de que a variável na Vercel se chama "VITE_API_KEY".
-const apiKey = (import.meta as any).env.VITE_API_KEY;
+// Função segura para obter a chave da API em diferentes ambientes (Vite ou Node/Webpack)
+const getApiKey = () => {
+    try {
+        // Tenta acessar via Vite (import.meta.env) com verificação segura
+        const viteKey = (import.meta as any).env?.VITE_API_KEY;
+        if (viteKey) return viteKey;
+    } catch (e) {}
 
-if (!apiKey) {
-    console.warn("AVISO: VITE_API_KEY não detectada. O gerador de livros via IA não funcionará.");
-}
+    try {
+        // Fallback para process.env (Node/Vercel padrão) com verificação de existência
+        if (typeof process !== 'undefined' && process.env) {
+            return process.env.API_KEY || process.env.VITE_API_KEY;
+        }
+    } catch (e) {}
 
-const ai = new GoogleGenAI({ apiKey: apiKey || "MISSING_KEY" });
+    return undefined;
+};
+
+const apiKey = getApiKey();
+
+// Instanciação Lazy (preguiçosa) para evitar erro fatal no load da página
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+    if (!apiKey) {
+        console.warn("AVISO: Chave da API (VITE_API_KEY ou API_KEY) não detectada.");
+        return null;
+    }
+    if (!aiInstance) {
+        aiInstance = new GoogleGenAI({ apiKey: apiKey });
+    }
+    return aiInstance;
+};
+
 
 type GeneratedBookData = Omit<Book, 'id' | 'title' | 'books2readUrl' | 'coverUrl' | 'createdAt'>;
 
 export const generateBookDetails = async (title: string): Promise<GeneratedBookData> => {
+    const ai = getAI();
+    
+    if (!ai) {
+        throw new Error("Chave da API Gemini não configurada.");
+    }
+
     const prompt = `Para o livro com o título '${title}', crie um conteúdo para um site de autor. O estilo deve ser dark fantasy elegante. Forneça sua resposta como um objeto JSON VÁLIDO e nada mais, sem formatação extra ou markdown. O objeto JSON deve ter as seguintes chaves: "fullSynopsis" (uma sinopse completa e envolvente com cerca de 3-4 parágrafos), "shortSynopsis" (uma sinopse curta e impactante de no máximo 3 linhas), e "firstChapterMarkdown" (o primeiro capítulo fictício do livro, escrito em markdown, com cerca de 500 palavras, contendo parágrafos e diálogos).`;
 
     try {

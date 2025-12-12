@@ -52,15 +52,17 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const initializeData = useCallback(async () => {
         setLoading(true);
         setError(null);
-        try {
-            // Se as chaves do Supabase não existirem (modo demo local), tenta fallback ou array vazio
-            if (!process.env.VITE_SUPABASE_URL) {
-                console.warn("Modo offline: Supabase não configurado.");
-                setIsInitialized(true);
-                setLoading(false);
-                return;
-            }
+        
+        // --- MODO OFFLINE / SEM SUPABASE ---
+        // Se o cliente supabase for null (chaves não configuradas), não tenta buscar nada.
+        if (!supabase) {
+            console.warn("Modo offline: Supabase não configurado. Carregando estado vazio.");
+            setIsInitialized(true);
+            setLoading(false);
+            return;
+        }
 
+        try {
             // --- FETCH BOOKS ---
             const { data: booksData, error: booksError } = await supabase
                 .from('books')
@@ -130,7 +132,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } catch (err) {
             console.error("Erro na inicialização Supabase:", err);
             // Não bloqueia o site se o DB falhar, apenas mostra vazio ou erro
-            setError("Não foi possível conectar à biblioteca arcana.");
+            setError("Não foi possível conectar à biblioteca arcana (Banco de Dados).");
         } finally {
             setLoading(false);
             setIsInitialized(true);
@@ -148,21 +150,24 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const id = Date.now().toString();
             const details = await generateBookDetails(title);
             
-            // Insere no Supabase
-            const { error: dbError } = await supabase.from('books').insert([{
-                id: id,
-                title: title,
-                books2read_url: books2readUrl,
-                amazon_url: amazonUrl,
-                cover_url: `https://picsum.photos/seed/${id}/800/1200`, // Placeholder inicial
-                short_synopsis: details.shortSynopsis,
-                full_synopsis: details.fullSynopsis,
-                first_chapter_markdown: details.firstChapterMarkdown
-            }]);
+            // Se Supabase estiver ativo, salva lá
+            if (supabase) {
+                const { error: dbError } = await supabase.from('books').insert([{
+                    id: id,
+                    title: title,
+                    books2read_url: books2readUrl,
+                    amazon_url: amazonUrl,
+                    cover_url: `https://picsum.photos/seed/${id}/800/1200`, // Placeholder inicial
+                    short_synopsis: details.shortSynopsis,
+                    full_synopsis: details.fullSynopsis,
+                    first_chapter_markdown: details.firstChapterMarkdown
+                }]);
+                if (dbError) throw new Error(dbError.message);
+            } else {
+                alert("Aviso: Supabase desconectado. O livro será perdido ao recarregar a página.");
+            }
 
-            if (dbError) throw new Error(dbError.message);
-
-            // Atualiza estado local
+            // Atualiza estado local (Optimistic UI)
             const newBook: Book = {
                 ...details,
                 id,
@@ -185,17 +190,17 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const updateBookCover = async (bookId: string, newCoverUrl: string) => {
-        // Atualiza DB
-        const { error } = await supabase
-            .from('books')
-            .update({ cover_url: newCoverUrl })
-            .eq('id', bookId);
+        if (supabase) {
+            const { error } = await supabase
+                .from('books')
+                .update({ cover_url: newCoverUrl })
+                .eq('id', bookId);
 
-        if (error) {
-            console.error("Erro ao atualizar capa no DB:", error);
-            return;
+            if (error) {
+                console.error("Erro ao atualizar capa no DB:", error);
+                return;
+            }
         }
-
         // Atualiza Local
         setBooks(prev => prev.map(book =>
             book.id === bookId ? { ...book, coverUrl: newCoverUrl } : book
@@ -204,17 +209,20 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const addBanner = async (imageUrl: string, linkUrl: string, position: 'left' | 'right') => {
         const id = Date.now().toString();
-        const { error } = await supabase.from('banners').insert([{
-            id,
-            image_url: imageUrl,
-            link_url: linkUrl,
-            position
-        }]);
+        
+        if (supabase) {
+            const { error } = await supabase.from('banners').insert([{
+                id,
+                image_url: imageUrl,
+                link_url: linkUrl,
+                position
+            }]);
 
-        if (error) {
-            console.error("Erro ao adicionar banner:", error);
-            alert("Erro ao salvar banner.");
-            return;
+            if (error) {
+                console.error("Erro ao adicionar banner:", error);
+                alert("Erro ao salvar banner no banco.");
+                return;
+            }
         }
 
         const newBanner: Banner = {
@@ -228,28 +236,32 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const removeBanner = async (bannerId: string) => {
-        const { error } = await supabase.from('banners').delete().eq('id', bannerId);
-        if (error) {
-            console.error("Erro ao remover banner:", error);
-            return;
+        if (supabase) {
+            const { error } = await supabase.from('banners').delete().eq('id', bannerId);
+            if (error) {
+                console.error("Erro ao remover banner:", error);
+                return;
+            }
         }
         setBanners(prev => prev.filter(b => b.id !== bannerId));
     };
 
     const addRelease = async (title: string, description: string, date: string, imageUrl: string) => {
         const id = Date.now().toString();
-        const { error } = await supabase.from('releases').insert([{
-            id,
-            title,
-            description,
-            date_text: date,
-            image_url: imageUrl
-        }]);
+        if (supabase) {
+            const { error } = await supabase.from('releases').insert([{
+                id,
+                title,
+                description,
+                date_text: date,
+                image_url: imageUrl
+            }]);
 
-        if (error) {
-            console.error("Erro ao adicionar lançamento:", error);
-            alert("Erro ao salvar lançamento.");
-            return;
+            if (error) {
+                console.error("Erro ao adicionar lançamento:", error);
+                alert("Erro ao salvar lançamento no banco.");
+                return;
+            }
         }
 
         const newRelease: Release = {
@@ -263,26 +275,28 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const removeRelease = async (releaseId: string) => {
-        const { error } = await supabase.from('releases').delete().eq('id', releaseId);
-        if (error) {
-            console.error("Erro ao remover lançamento:", error);
-            return;
+        if (supabase) {
+            const { error } = await supabase.from('releases').delete().eq('id', releaseId);
+            if (error) {
+                console.error("Erro ao remover lançamento:", error);
+                return;
+            }
         }
         setReleases(prev => prev.filter(r => r.id !== releaseId));
     };
 
     const updateAuthorPhoto = async (newPhotoUrl: string) => {
-        // Upsert (Insert ou Update) na tabela de settings
-        const { error } = await supabase
-            .from('site_settings')
-            .upsert({ key: 'author_photo', value: newPhotoUrl });
+        if (supabase) {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert({ key: 'author_photo', value: newPhotoUrl });
 
-        if (error) {
-            console.error("Erro ao salvar foto do autor:", error);
-            alert("Erro ao salvar no banco de dados.");
-            return;
+            if (error) {
+                console.error("Erro ao salvar foto do autor:", error);
+                alert("Erro ao salvar no banco de dados.");
+                return;
+            }
         }
-
         setAuthorPhoto(newPhotoUrl);
     };
 
