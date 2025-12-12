@@ -1,41 +1,16 @@
-
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { Book } from '../types';
 
-// Função segura para obter a chave da API em diferentes ambientes (Vite ou Node/Webpack)
-const getApiKey = () => {
-    try {
-        // Tenta acessar via Vite (import.meta.env) com verificação segura
-        const viteKey = (import.meta as any).env?.VITE_API_KEY;
-        if (viteKey) return viteKey;
-    } catch (e) {}
-
-    try {
-        // Fallback para process.env (Node/Vercel padrão) com verificação de existência
-        if (typeof process !== 'undefined' && process.env) {
-            return process.env.API_KEY || process.env.VITE_API_KEY;
-        }
-    } catch (e) {}
-
-    return undefined;
-};
-
-const apiKey = getApiKey();
-
-// Instanciação Lazy (preguiçosa) para evitar erro fatal no load da página
 let aiInstance: GoogleGenAI | null = null;
 
 const getAI = () => {
-    if (!apiKey) {
-        console.warn("AVISO: Chave da API (VITE_API_KEY ou API_KEY) não detectada.");
-        return null;
-    }
+    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    // Assume this variable is pre-configured, valid, and accessible in the execution context.
     if (!aiInstance) {
-        aiInstance = new GoogleGenAI({ apiKey: apiKey });
+        aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY });
     }
     return aiInstance;
 };
-
 
 type GeneratedBookData = Omit<Book, 'id' | 'title' | 'books2readUrl' | 'coverUrl' | 'createdAt'>;
 
@@ -76,6 +51,6 @@ export const generateBookDetails = async (title: string): Promise<GeneratedBookD
 
     } catch (error) {
         console.error("Erro ao gerar detalhes do livro:", error);
-        throw new Error("Não foi possível gerar os detalhes do livro. Verifique o console para mais informações.");
+        throw new Error("Não foi possível gerar os detalhes do livro.");
     }
 };

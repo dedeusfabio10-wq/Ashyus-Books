@@ -1,38 +1,32 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Função auxiliar para obter variáveis de ambiente de forma segura
-const getEnv = (viteKey: string, processKey?: string) => {
+// Função simplificada e SEGURA para Vite
+// Removemos qualquer tentativa de ler process.env, pois isso quebra o build do Vite na Vercel
+const getEnv = (key: string) => {
     try {
-        // Tenta Vite
-        const val = (import.meta as any).env?.[viteKey];
-        if (val) return val;
-    } catch(e) {}
-
-    try {
-        // Tenta Process
-        if (typeof process !== 'undefined' && process.env) {
-            return process.env[viteKey] || (processKey ? process.env[processKey] : undefined);
-        }
-    } catch(e) {}
-    
-    return undefined;
+        // @ts-ignore
+        return import.meta.env[key];
+    } catch (e) {
+        return undefined;
+    }
 };
 
-const supabaseUrl = getEnv('VITE_SUPABASE_URL', 'SUPABASE_URL');
-const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY');
+const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY');
 
 let client: SupabaseClient | null = null;
+
+console.log("Inicializando Supabase...", supabaseUrl ? "URL encontrada" : "URL ausente");
 
 if (supabaseUrl && supabaseAnonKey) {
     try {
         client = createClient(supabaseUrl, supabaseAnonKey);
     } catch (e) {
-        console.warn("Falha ao inicializar Supabase Client:", e);
+        console.error("Falha ao inicializar Supabase Client:", e);
     }
 } else {
-    console.warn("Supabase URL ou Key não encontradas. O site rodará em modo offline/demo.");
+    console.warn("Supabase URL ou Key não encontradas no import.meta.env.");
 }
 
-// Exporta o cliente (pode ser null)
 export const supabase = client;
