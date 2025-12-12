@@ -2,7 +2,16 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { Book } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// CORREÇÃO CRÍTICA PARA VERCEL:
+// O navegador não possui "process.env". Usamos "import.meta.env" no Vite.
+// Certifique-se de que a variável na Vercel se chama "VITE_API_KEY".
+const apiKey = (import.meta as any).env.VITE_API_KEY;
+
+if (!apiKey) {
+    console.warn("AVISO: VITE_API_KEY não detectada. O gerador de livros via IA não funcionará.");
+}
+
+const ai = new GoogleGenAI({ apiKey: apiKey || "MISSING_KEY" });
 
 type GeneratedBookData = Omit<Book, 'id' | 'title' | 'books2readUrl' | 'coverUrl' | 'createdAt'>;
 
