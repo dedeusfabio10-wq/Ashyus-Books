@@ -1,32 +1,32 @@
-import { AdminPanel } from '@/components/AdminPanel';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import BookCard from '../components/BookCard';
+import Loader from '../components/Loader';
 
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-950 to-black text-white">
-      <Header />
-      <main className="container mx-auto px-8 py-20 text-center">
-        <h1 className="text-6xl md:text-8xl font-bold mb-8">
-          Ashyus Books
-        </h1>
-        <p className="text-2xl md:text-3xl text-purple-300 mb-12">
-          Fantasia • Romance • Young Adult
-        </p>
-        <div className="text-xl md:text-2xl text-gray-300">
-          <p>Em breve novos lançamentos incríveis…</p>
-          <p className="mt-8">Enquanto isso, conheça meus livros nas lojas:</p>
-          <a
-            href="https://books2read.com/ap/n7qD8R/Ashyus"
-            className="inline-block mt-8 px-12 py-6 bg-purple-600 rounded-xl text-2xl hover:bg-purple-500 transition"
-            target="_blank"
-          >
-            Todos os meus livros
-          </a>
+const HomePage: React.FC = () => {
+    const { books, loading, error, isInitialized } = useContext(BookContext);
+
+    return (
+        <div className="animate-fade-in">
+            <section className="text-center mb-12 md:mb-16">
+                <h2 className="font-serif text-4xl md:text-5xl font-bold text-brand-lighter mb-2">
+                    Mundos forjados em Tinta e Sombra
+                </h2>
+                <p className="text-lg text-brand-gold">
+                    Fantasia • Romance • Mistério • Young Adult
+                </p>
+            </section>
+            
+            {loading && !isInitialized && <div className="text-center"><Loader message="Invocando os grimórios..." /></div>}
+            {error && <p className="text-center text-red-500">{error}</p>}
+            
+            {isInitialized && (
+                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8">
+                    {books.map(book => (
+                        <BookCard key={book.id} book={book} />
+                    ))}
+                </div>
+            )}
         </div>
-      </main>
-      <Footer />
-      <AdminPanel />
-    </div>
-  );
-}
+    );
+};
+
+export default HomePage;
