@@ -4,10 +4,17 @@ import { Book } from '../types';
 let aiInstance: GoogleGenAI | null = null;
 
 const getAI = () => {
-    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
-    // Assume this variable is pre-configured, valid, and accessible in the execution context.
+    // A chave é injetada pelo vite.config.ts via define: 'process.env.API_KEY'
+    // O valor virá da variável GEMINI_API_KEY configurada na Vercel.
+    const apiKey = process.env.API_KEY;
+
+    if (!apiKey) {
+        console.error("API Key não encontrada. Verifique se GEMINI_API_KEY está configurada na Vercel.");
+        return null;
+    }
+
     if (!aiInstance) {
-        aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        aiInstance = new GoogleGenAI({ apiKey: apiKey });
     }
     return aiInstance;
 };
@@ -18,7 +25,7 @@ export const generateBookDetails = async (title: string): Promise<GeneratedBookD
     const ai = getAI();
     
     if (!ai) {
-        throw new Error("Chave da API Gemini não configurada.");
+        throw new Error("Erro de Configuração: API Key do Gemini não detectada. Configure a variável de ambiente GEMINI_API_KEY.");
     }
 
     const prompt = `Para o livro com o título '${title}', crie um conteúdo para um site de autor. O estilo deve ser dark fantasy elegante. Forneça sua resposta como um objeto JSON VÁLIDO e nada mais, sem formatação extra ou markdown. O objeto JSON deve ter as seguintes chaves: "fullSynopsis" (uma sinopse completa e envolvente com cerca de 3-4 parágrafos), "shortSynopsis" (uma sinopse curta e impactante de no máximo 3 linhas), e "firstChapterMarkdown" (o primeiro capítulo fictício do livro, escrito em markdown, com cerca de 500 palavras, contendo parágrafos e diálogos).`;
@@ -51,6 +58,6 @@ export const generateBookDetails = async (title: string): Promise<GeneratedBookD
 
     } catch (error) {
         console.error("Erro ao gerar detalhes do livro:", error);
-        throw new Error("Não foi possível gerar os detalhes do livro.");
+        throw new Error("Não foi possível gerar os detalhes do livro. Verifique a chave da API e a conexão.");
     }
 };
