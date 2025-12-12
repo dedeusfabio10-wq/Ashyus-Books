@@ -21,7 +21,13 @@ console.log("Inicializando Supabase...", supabaseUrl ? "URL encontrada" : "URL a
 
 if (supabaseUrl && supabaseAnonKey) {
     try {
-        client = createClient(supabaseUrl, supabaseAnonKey);
+        client = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+            }
+        });
     } catch (e) {
         console.error("Falha ao inicializar Supabase Client:", e);
     }
@@ -30,3 +36,4 @@ if (supabaseUrl && supabaseAnonKey) {
 }
 
 export const supabase = client;
+    

@@ -1,3 +1,6 @@
+
+import React, { useContext } from 'react';
+import { BookContext } from '../context/BookContext';
 import BookCard from '../components/BookCard';
 import Loader from '../components/Loader';
 
