@@ -1,33 +1,13 @@
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { Book } from '../types';
 
-let aiInstance: GoogleGenAI | null = null;
-
-const getAI = () => {
-    // A chave é injetada pelo vite.config.ts via define: 'process.env.API_KEY'
-    // O valor virá da variável GEMINI_API_KEY configurada na Vercel.
-    const apiKey = process.env.API_KEY;
-
-    if (!apiKey) {
-        console.error("API Key não encontrada. Verifique se GEMINI_API_KEY está configurada na Vercel.");
-        return null;
-    }
-
-    if (!aiInstance) {
-        aiInstance = new GoogleGenAI({ apiKey: apiKey });
-    }
-    return aiInstance;
-};
+// Initialize the GoogleGenAI client with the API key from process.env.API_KEY.
+// As per guidelines, we assume the environment variable is pre-configured and valid.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 type GeneratedBookData = Omit<Book, 'id' | 'title' | 'books2readUrl' | 'coverUrl' | 'createdAt'>;
 
 export const generateBookDetails = async (title: string): Promise<GeneratedBookData> => {
-    const ai = getAI();
-    
-    if (!ai) {
-        throw new Error("Erro de Configuração: API Key do Gemini não detectada. Configure a variável de ambiente GEMINI_API_KEY.");
-    }
-
     const prompt = `Para o livro com o título '${title}', crie um conteúdo para um site de autor. O estilo deve ser dark fantasy elegante. Forneça sua resposta como um objeto JSON VÁLIDO e nada mais, sem formatação extra ou markdown. O objeto JSON deve ter as seguintes chaves: "fullSynopsis" (uma sinopse completa e envolvente com cerca de 3-4 parágrafos), "shortSynopsis" (uma sinopse curta e impactante de no máximo 3 linhas), e "firstChapterMarkdown" (o primeiro capítulo fictício do livro, escrito em markdown, com cerca de 500 palavras, contendo parágrafos e diálogos).`;
 
     try {
