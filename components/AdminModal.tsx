@@ -27,6 +27,9 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
     const [url, setUrl] = useState('');
     const [amazonUrl, setAmazonUrl] = useState('');
     const [coverImage, setCoverImage] = useState<string | null>(null);
+    const [shortSynopsis, setShortSynopsis] = useState('');
+    const [fullSynopsis, setFullSynopsis] = useState('');
+    const [firstChapter, setFirstChapter] = useState('');
     const [addError, setAddError] = useState('');
 
     // Banner State
@@ -79,17 +82,27 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
     const handleAddBook = async (e: FormEvent) => {
         e.preventDefault();
         setAddError('');
-        if (!title || !url) {
-            setAddError('Título e URL Books2Read são obrigatórios.');
+        if (!title || !url || !shortSynopsis || !fullSynopsis || !firstChapter) {
+            setAddError('Preencha todos os campos obrigatórios.');
             return;
         }
         try {
-            // Passa a imagem da capa (se houver) para a função addBook
-            await addBook(title, url, amazonUrl, coverImage || undefined);
+            await addBook(
+                title, 
+                url, 
+                amazonUrl, 
+                coverImage || undefined,
+                shortSynopsis,
+                fullSynopsis,
+                firstChapter
+            );
             setTitle('');
             setUrl('');
             setAmazonUrl('');
             setCoverImage(null);
+            setShortSynopsis('');
+            setFullSynopsis('');
+            setFirstChapter('');
             alert('Livro adicionado com sucesso!');
         } catch (error) {
             setAddError(error instanceof Error ? error.message : "Ocorreu um erro desconhecido.");
@@ -171,7 +184,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in" onClick={onClose}>
-            <div className="bg-brand-darker rounded-lg shadow-2xl shadow-black/50 border border-gray-700 w-full max-w-2xl m-4 p-8 relative animate-slide-up max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="bg-brand-darker rounded-lg shadow-2xl shadow-black/50 border border-gray-700 w-full max-w-4xl m-4 p-8 relative animate-slide-up max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-2xl leading-none">&times;</button>
                 <h2 className="font-serif text-2xl text-brand-gold mb-6 text-center">Painel de Administração</h2>
                 
@@ -195,30 +208,71 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
                         </div>
 
                         {activeTab === 'add' && (
-                            <form onSubmit={handleAddBook} className="animate-fade-in">
-                                <p className="text-center mb-4 text-gray-300">Adicione um novo livro ao site.</p>
+                            <form onSubmit={handleAddBook} className="animate-fade-in grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
+                                    <h3 className="text-brand-gold font-bold border-b border-gray-700 pb-2">Informações Básicas</h3>
+                                    
                                     <input type="text" placeholder="Título do Livro" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" required />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <input type="url" placeholder="Link Amazon (Opcional)" value={amazonUrl} onChange={e => setAmazonUrl(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" />
-                                        <input type="url" placeholder="Link Books2Read (Multi-lojas)" value={url} onChange={e => setUrl(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" required />
-                                    </div>
+                                    
+                                    <input type="url" placeholder="Link Amazon (Opcional)" value={amazonUrl} onChange={e => setAmazonUrl(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" />
+                                    
+                                    <input type="url" placeholder="Link Books2Read (Multi-lojas)" value={url} onChange={e => setUrl(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-gold" required />
+                                    
                                     <div>
-                                        <label className="block text-gray-400 text-sm mb-1">Capa do Livro (Opcional)</label>
+                                        <label className="block text-gray-400 text-sm mb-1">Capa do Livro</label>
                                         <input type="file" accept="image/*" onChange={handleBookCoverUpload} className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-brand-gold file:text-brand-dark hover:file:bg-brand-gold-dark"/>
-                                        <p className="text-xs text-gray-500 mt-1">Se não enviar, uma imagem aleatória será gerada.</p>
                                         {coverImage && <img src={coverImage} alt="Preview" className="mt-2 h-24 object-contain border border-gray-600" />}
                                     </div>
-                                    <p className="text-xs text-gray-500">O Books2Read agrega Kobo, Apple, Google e outras. A Amazon é bom ter separado.</p>
+
+                                    <div>
+                                        <label className="block text-gray-400 text-sm mb-1">Sinopse Curta (Cartão)</label>
+                                        <textarea 
+                                            value={shortSynopsis} 
+                                            onChange={e => setShortSynopsis(e.target.value)} 
+                                            placeholder="Breve resumo que aparece na capa (max 3 linhas)..." 
+                                            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white h-24 focus:outline-none focus:ring-2 focus:ring-brand-gold text-sm"
+                                            required 
+                                        />
+                                    </div>
                                 </div>
-                                {loading ? (
-                                    <div className="mt-6"><Loader message="Gerando conteúdo..."/></div>
-                                ) : (
-                                    <>
-                                        {addError && <p className="text-red-500 text-sm mt-4">{addError}</p>}
-                                        <button type="submit" className="w-full mt-6 bg-brand-gold text-brand-dark font-bold py-2 px-4 rounded hover:bg-brand-gold-dark transition-colors">Adicionar Livro</button>
-                                    </>
-                                )}
+
+                                <div className="space-y-4">
+                                    <h3 className="text-brand-gold font-bold border-b border-gray-700 pb-2">Conteúdo Detalhado</h3>
+                                    
+                                    <div>
+                                        <label className="block text-gray-400 text-sm mb-1">Sinopse Completa</label>
+                                        <textarea 
+                                            value={fullSynopsis} 
+                                            onChange={e => setFullSynopsis(e.target.value)} 
+                                            placeholder="A sinopse completa que aparece na página do livro..." 
+                                            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white h-32 focus:outline-none focus:ring-2 focus:ring-brand-gold text-sm"
+                                            required 
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-gray-400 text-sm mb-1">Primeiro Capítulo (Markdown)</label>
+                                        <textarea 
+                                            value={firstChapter} 
+                                            onChange={e => setFirstChapter(e.target.value)} 
+                                            placeholder="Cole aqui o texto do primeiro capítulo..." 
+                                            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white h-48 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                                            required 
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Suporta quebras de linha para parágrafos.</p>
+                                    </div>
+
+                                    {loading ? (
+                                        <div className="mt-6"><Loader message="Salvando..."/></div>
+                                    ) : (
+                                        <>
+                                            {addError && <p className="text-red-500 text-sm mt-4">{addError}</p>}
+                                            <button type="submit" className="w-full bg-brand-gold text-brand-dark font-bold py-3 px-4 rounded hover:bg-brand-gold-dark transition-colors text-lg shadow-lg">
+                                                Publicar Livro
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </form>
                         )}
 

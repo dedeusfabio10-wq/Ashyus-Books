@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Book, Banner, Release } from '../types';
-import { generateBookDetails } from '../services/geminiService';
 import { supabase } from '../services/supabaseClient';
 
 interface BookContextType {
@@ -10,7 +9,15 @@ interface BookContextType {
     authorPhoto: string;
     loading: boolean;
     error: string | null;
-    addBook: (title: string, books2readUrl: string, amazonUrl?: string, coverBase64?: string) => Promise<void>;
+    addBook: (
+        title: string, 
+        books2readUrl: string, 
+        amazonUrl: string | undefined, 
+        coverBase64: string | undefined,
+        shortSynopsis: string,
+        fullSynopsis: string,
+        firstChapter: string
+    ) => Promise<void>;
     updateBookCover: (bookId: string, newCoverUrl: string) => Promise<void>;
     addBanner: (imageUrl: string, linkUrl: string, position: 'left' | 'right') => Promise<void>;
     removeBanner: (bannerId: string) => Promise<void>;
@@ -53,7 +60,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setError(null);
         
         // --- MODO OFFLINE / SEM SUPABASE ---
-        // Se o cliente supabase for null (chaves não configuradas), não tenta buscar nada.
         if (!supabase) {
             console.warn("Modo offline: Supabase não configurado. Carregando estado vazio.");
             setIsInitialized(true);
@@ -70,7 +76,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (booksError) throw booksError;
             
-            // Mapeia os campos do DB (snake_case) para o tipo TS (camelCase)
             const mappedBooks: Book[] = (booksData || []).map((b: any) => ({
                 id: b.id,
                 title: b.title,
@@ -112,7 +117,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 id: r.id,
                 title: r.title,
                 description: r.description,
-                date: r.date_text, // mapeado do banco "date_text"
+                date: r.date_text,
                 imageUrl: r.image_url
             }));
             setReleases(mappedReleases);
@@ -130,7 +135,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         } catch (err) {
             console.error("Erro na inicialização Supabase:", err);
-            // Não bloqueia o site se o DB falhar, apenas mostra vazio ou erro
             setError("Não foi possível conectar à biblioteca arcana (Banco de Dados).");
         } finally {
             setLoading(false);
@@ -142,12 +146,19 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         initializeData();
     }, [initializeData]);
 
-    const addBook = async (title: string, books2readUrl: string, amazonUrl?: string, coverBase64?: string) => {
+    const addBook = async (
+        title: string, 
+        books2readUrl: string, 
+        amazonUrl: string | undefined, 
+        coverBase64: string | undefined,
+        shortSynopsis: string,
+        fullSynopsis: string,
+        firstChapter: string
+    ) => {
         setLoading(true);
         setError(null);
         try {
             const id = Date.now().toString();
-            const details = await generateBookDetails(title);
             
             // Usa a imagem enviada ou gera um placeholder
             const finalCoverUrl = coverBase64 || `https://picsum.photos/seed/${id}/800/1200`;
@@ -160,9 +171,9 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     books2read_url: books2readUrl,
                     amazon_url: amazonUrl,
                     cover_url: finalCoverUrl,
-                    short_synopsis: details.shortSynopsis,
-                    full_synopsis: details.fullSynopsis,
-                    first_chapter_markdown: details.firstChapterMarkdown
+                    short_synopsis: shortSynopsis,
+                    full_synopsis: fullSynopsis,
+                    first_chapter_markdown: firstChapter
                 }]);
                 if (dbError) throw new Error(dbError.message);
             } else {
@@ -171,12 +182,14 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             // Atualiza estado local (Optimistic UI)
             const newBook: Book = {
-                ...details,
                 id,
                 title,
                 books2readUrl,
                 amazonUrl,
                 coverUrl: finalCoverUrl,
+                shortSynopsis,
+                fullSynopsis,
+                firstChapterMarkdown: firstChapter,
                 createdAt: new Date().toISOString(),
             };
 
@@ -203,7 +216,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 return;
             }
         }
-        // Atualiza Local
         setBooks(prev => prev.map(book =>
             book.id === bookId ? { ...book, coverUrl: newCoverUrl } : book
         ));
