@@ -53,12 +53,13 @@ const AtmosphericEvents: React.FC = () => {
 
     if (!activeEvent) return null;
 
+    // z-40 garante que fique acima do conteúdo (z-10), mas abaixo do Header (z-50) e Modais
     return (
-        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden" aria-hidden="true">
             {/* --- BRUXA --- */}
             {activeEvent === 'witch' && (
                 <div key={`witch-${eventKey}`} className="absolute top-1/4 left-0 animate-fly-diagonal opacity-0">
-                    <svg width="100" height="100" viewBox="0 0 100 100" className="text-black/40 fill-current drop-shadow-lg">
+                    <svg width="100" height="100" viewBox="0 0 100 100" className="text-black/60 fill-current drop-shadow-xl filter drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]">
                          <path d="M10,80 L90,20" stroke="currentColor" strokeWidth="2" /> {/* Vassoura */}
                          <path d="M40,50 L50,10 L60,50 Z" /> {/* Chapéu */}
                          <circle cx="50" cy="50" r="10" /> {/* Cabeça */}
@@ -70,10 +71,10 @@ const AtmosphericEvents: React.FC = () => {
             {/* --- WYVERN (Dragão) --- */}
             {activeEvent === 'wyvern' && (
                 <div key={`wyvern-${eventKey}`} className="absolute top-10 left-0 w-64 h-64 animate-fly-straight opacity-0">
-                    <svg viewBox="0 0 200 100" className="text-black/30 fill-current">
+                    <svg viewBox="0 0 200 100" className="text-black/50 fill-current filter drop-shadow-xl">
                         {/* Asas e Corpo simplificado */}
                         <path d="M100,50 Q150,10 190,40 L160,60 Q120,40 100,50 Q80,40 40,60 L10,40 Q50,10 100,50 Z" />
-                        <circle cx="100" cy="50" r="5" className="fill-brand-gold/50" /> {/* Olho brilhante sutil */}
+                        <circle cx="100" cy="50" r="5" className="fill-brand-gold/70" /> {/* Olho brilhante sutil */}
                     </svg>
                 </div>
             )}
@@ -81,7 +82,7 @@ const AtmosphericEvents: React.FC = () => {
             {/* --- GOBLIN ESPIÃO --- */}
             {activeEvent === 'goblin_peek' && (
                 <div key={`goblin-${eventKey}`} className="absolute bottom-0 right-10 md:right-32 animate-peek-up opacity-0">
-                    <svg width="120" height="100" viewBox="0 0 120 100" className="text-black/80 fill-current drop-shadow-2xl">
+                    <svg width="120" height="100" viewBox="0 0 120 100" className="text-black/90 fill-current drop-shadow-[0_-5px_15px_rgba(0,0,0,0.8)]">
                         {/* Cabeça e Orelhas pontudas */}
                         <path d="M30,100 L30,60 Q30,30 60,30 Q90,30 90,60 L90,100 Z" />
                         <path d="M30,60 L10,40 L30,50" /> {/* Orelha Esq */}
@@ -95,7 +96,7 @@ const AtmosphericEvents: React.FC = () => {
             {/* --- FLECHA ESPECTRAL --- */}
             {activeEvent === 'arrow' && (
                 <div key={`arrow-${eventKey}`} className="absolute top-1/2 left-0 w-full animate-arrow-shot opacity-0" style={{ top: `${Math.random() * 80 + 10}%` }}>
-                    <div className="w-32 h-1 bg-gradient-to-r from-transparent via-brand-gold/50 to-white shadow-[0_0_15px_rgba(251,191,36,0.8)] rounded-full relative">
+                    <div className="w-32 h-1 bg-gradient-to-r from-transparent via-brand-gold/80 to-white shadow-[0_0_15px_rgba(251,191,36,0.9)] rounded-full relative">
                         {/* Ponta */}
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[10px] border-l-white"></div>
                     </div>
@@ -113,8 +114,8 @@ const AtmosphericEvents: React.FC = () => {
                         animationDuration: '8s'
                     }}
                 >
-                    <div className="w-4 h-4 bg-cyan-400 rounded-full blur-[6px] animate-pulse opacity-60 shadow-[0_0_20px_rgba(34,211,238,0.8)]"></div>
-                    <div className="absolute inset-0 w-4 h-4 bg-white rounded-full blur-[2px] opacity-80"></div>
+                    <div className="w-4 h-4 bg-cyan-400 rounded-full blur-[6px] animate-pulse opacity-80 shadow-[0_0_20px_rgba(34,211,238,0.9)]"></div>
+                    <div className="absolute inset-0 w-4 h-4 bg-white rounded-full blur-[2px] opacity-90"></div>
                 </div>
             )}
         </div>

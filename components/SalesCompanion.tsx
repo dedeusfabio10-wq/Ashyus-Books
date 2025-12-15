@@ -78,6 +78,16 @@ const SalesCompanion: React.FC = () => {
         setPosition({ x: newX, y: newY });
     };
 
+    const handleDismiss = () => {
+        setIsVisible(false);
+        // Reaparece após 2 minutos (120000 ms)
+        setTimeout(() => {
+            setIsVisible(true);
+            setCurrentState('moving'); // Volta se movendo para chamar atenção suavemente
+            changePosition();
+        }, 120000);
+    };
+
     if (!isVisible) return null;
 
     // Determina o link e imagem baseada no item ativo
@@ -99,9 +109,9 @@ const SalesCompanion: React.FC = () => {
             >
                 {/* --- BOTÃO FECHAR --- */}
                 <button 
-                    onClick={() => setIsVisible(false)}
-                    className="absolute -top-6 -right-6 w-6 h-6 bg-red-900/80 text-white rounded-full flex items-center justify-center text-xs border border-red-500 opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity z-50 cursor-pointer"
-                    title="Dispensar Autômato"
+                    onClick={handleDismiss}
+                    className="absolute -top-6 -right-6 w-6 h-6 bg-red-900/80 text-white rounded-full flex items-center justify-center text-xs border border-red-500 opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity z-50 cursor-pointer shadow-lg"
+                    title="Dispensar por 2 minutos"
                 >
                     ✕
                 </button>
