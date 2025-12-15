@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { BookProvider } from './context/BookContext';
 import Header from './components/Header';
@@ -9,6 +8,7 @@ import BlogPage from './pages/BlogPage';
 import Footer from './components/Footer';
 import AdminModal from './components/AdminModal';
 import AdSidebar from './components/AdSidebar';
+import MobileAdBanner from './components/MobileAdBanner';
 import IntroOverlay from './components/IntroOverlay';
 import AtmosphericEvents from './components/AtmosphericEvents';
 import { playPageTurnSound } from './utils/audio';
@@ -86,7 +86,7 @@ const App: React.FC = () => {
                     <AdSidebar side="left" />
 
                     {/* Conteúdo Principal */}
-                    <main className="flex-1 max-w-full min-w-0">
+                    <main className="flex-1 max-w-full min-w-0 mb-32 xl:mb-0">
                         {renderPage()}
                     </main>
 
@@ -96,6 +96,10 @@ const App: React.FC = () => {
                 </div>
 
                 <Footer />
+                
+                {/* Banner Mobile (Aparece apenas em telas menores que XL) */}
+                <MobileAdBanner />
+
                 {isAdminModalOpen && <AdminModal onClose={closeAdminModal} />}
             </div>
         </BookProvider>
