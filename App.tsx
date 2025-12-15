@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import AdminModal from './components/AdminModal';
 import AdSidebar from './components/AdSidebar';
 import MobileAdBanner from './components/MobileAdBanner';
+import SalesCompanion from './components/SalesCompanion';
 import IntroOverlay from './components/IntroOverlay';
 import AtmosphericEvents from './components/AtmosphericEvents';
 import { playPageTurnSound } from './utils/audio';
@@ -99,6 +100,9 @@ const App: React.FC = () => {
                 
                 {/* Banner Mobile (Aparece apenas em telas menores que XL) */}
                 <MobileAdBanner />
+
+                {/* Autômato de Vendas (Robozinho) */}
+                <SalesCompanion />
 
                 {isAdminModalOpen && <AdminModal onClose={closeAdminModal} />}
             </div>
