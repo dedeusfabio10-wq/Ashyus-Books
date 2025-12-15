@@ -9,6 +9,9 @@ const MobileAdBanner: React.FC = () => {
     // xl:hidden garante que só apareça em telas menores que o desktop extra large (onde as sidebars aparecem)
     if (!isVisible || banners.length === 0) return null;
 
+    // Duplicamos os banners para criar o efeito de loop infinito horizontal
+    const displayBanners = [...banners, ...banners, ...banners];
+
     return (
         <div className="xl:hidden fixed bottom-0 left-0 w-full z-40 bg-slate-900/95 backdrop-blur-md border-t border-brand-gold/30 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] animate-slide-up pb-safe">
             
@@ -21,18 +24,20 @@ const MobileAdBanner: React.FC = () => {
                 ✕
             </button>
 
-            <div className="p-4">
-                <p className="text-[10px] text-brand-gold uppercase tracking-widest mb-2 font-bold">Parceiros</p>
+            <div className="py-4 overflow-hidden relative">
+                <p className="absolute top-1 left-4 text-[10px] text-brand-gold uppercase tracking-widest font-bold z-10 bg-slate-900/80 px-2 rounded">
+                    Parceiros
+                </p>
                 
-                {/* Container de Scroll Horizontal */}
-                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-brand-gold/20 scrollbar-track-transparent snap-x">
-                    {banners.map(banner => (
+                {/* Container de Animação Horizontal (Marquee) */}
+                <div className="flex gap-4 w-max animate-infinite-scroll-left hover:[animation-play-state:paused] px-4">
+                    {displayBanners.map((banner, index) => (
                         <a 
-                            key={banner.id} 
+                            key={`${banner.id}-${index}`} 
                             href={banner.linkUrl} 
                             target="_blank" 
                             rel="noopener noreferrer sponsored"
-                            className="flex-shrink-0 relative group rounded-lg overflow-hidden border border-white/10 bg-slate-800/50 h-24 w-auto aspect-[3/2] snap-center shadow-md"
+                            className="flex-shrink-0 relative group rounded-lg overflow-hidden border border-white/10 bg-slate-800/50 h-20 w-auto aspect-[3/2] shadow-md"
                         >
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
                             <img 
