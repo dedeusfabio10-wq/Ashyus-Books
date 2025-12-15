@@ -7,7 +7,7 @@ type CompanionState = 'idle' | 'promoting_ad' | 'promoting_book' | 'moving';
 const SalesCompanion: React.FC = () => {
     const { banners, books } = useContext(BookContext);
     const [isVisible, setIsVisible] = useState(true);
-    const [position, setPosition] = useState({ x: 85, y: 70 }); // Porcentagem da tela (left, top)
+    const [position, setPosition] = useState({ x: 80, y: 70 }); // Começa em posição segura
     const [currentState, setCurrentState] = useState<CompanionState>('idle');
     const [message, setMessage] = useState('');
     const [activeItem, setActiveItem] = useState<any>(null); // Pode ser Banner ou Book
@@ -74,23 +74,26 @@ const SalesCompanion: React.FC = () => {
     }, [isVisible, banners, books, isHovered]);
 
     const changePosition = () => {
-        // Move para uma posição aleatória, mas mantendo nas bordas ou parte inferior para não atrapalhar a leitura
-        // X: entre 5% e 90%
-        // Y: entre 40% e 85% (evita header)
-        const newX = Math.floor(Math.random() * 85) + 5;
+        // AJUSTE: Margens de segurança aumentadas para garantir que o botão de fechar não saia da tela
+        // O botão fica à direita (-right-4), então limitamos o X máximo a 85% (antes era 90% ou mais)
+        const newX = Math.floor(Math.random() * 75) + 5; // 5% a 80%
         const newY = Math.floor(Math.random() * 45) + 40;
         setPosition({ x: newX, y: newY });
     };
 
-    const handleDismiss = () => {
-        playRobotSound(); // Som ao fechar
+    const handleDismiss = (e: React.MouseEvent) => {
+        // Previne propagação para garantir que o clique seja capturado apenas pelo botão
+        e.stopPropagation();
+        
+        playRobotSound(); 
         setIsVisible(false);
+        
         // Reaparece após 2 minutos (120000 ms)
         setTimeout(() => {
             setIsVisible(true);
-            setCurrentState('moving'); // Volta se movendo para chamar atenção suavemente
+            setCurrentState('moving'); 
             changePosition();
-            playRobotSound(); // Som ao reaparecer
+            playRobotSound(); 
         }, 120000);
     };
 
@@ -101,22 +104,25 @@ const SalesCompanion: React.FC = () => {
     const imageUrl = currentState === 'promoting_ad' ? activeItem?.imageUrl : activeItem?.coverUrl;
 
     return (
+        // AJUSTE: Z-Index 100 para garantir que fique acima de tudo (incluindo neblina e overlays)
         <div 
-            className="fixed z-50 transition-all duration-[2000ms] ease-in-out pointer-events-none"
+            className="fixed z-[100] transition-all duration-[2000ms] ease-in-out pointer-events-none"
             style={{ 
                 left: `${position.x}%`, 
                 top: `${position.y}%`,
             }}
         >
             <div 
-                className="relative pointer-events-auto"
+                className="relative pointer-events-auto group"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* --- BOTÃO FECHAR --- */}
+                {/* AJUSTE: Removido opacity-0. Agora é sempre visível (opacity-80) para facilitar o clique. */}
+                {/* AJUSTE: Pointer-events-auto reforçado e z-50 relativo ao container */}
                 <button 
                     onClick={handleDismiss}
-                    className="absolute -top-6 -right-6 w-8 h-8 bg-red-900 text-white rounded-full flex items-center justify-center text-sm border border-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 cursor-pointer shadow-lg hover:bg-red-700 pointer-events-auto"
+                    className="absolute -top-5 -right-5 w-8 h-8 bg-red-900 text-white rounded-full flex items-center justify-center text-sm border-2 border-red-500 opacity-80 hover:opacity-100 hover:scale-110 transition-all duration-200 z-50 cursor-pointer shadow-[0_0_10px_rgba(220,38,38,0.5)] pointer-events-auto"
                     title="Dispensar por 2 minutos"
                     aria-label="Dispensar robô"
                 >
@@ -151,7 +157,10 @@ const SalesCompanion: React.FC = () => {
                 )}
 
                 {/* --- O ROBÔ (AUTÔMATO ARCANO) --- */}
-                <div className="w-16 h-16 md:w-20 md:h-20 relative animate-float-slow cursor-pointer group">
+                <div 
+                    className="w-16 h-16 md:w-20 md:h-20 relative animate-float-slow cursor-pointer"
+                    onClick={() => { playRobotSound(); }} // Clique no corpo faz barulho
+                >
                     {/* Aura Mágica */}
                     <div className="absolute inset-0 bg-brand-gold/20 blur-xl rounded-full group-hover:bg-cyan-400/30 transition-colors duration-500"></div>
 
