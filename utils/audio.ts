@@ -84,3 +84,36 @@ export const playPageTurnSound = () => {
         // Silently fail if context not ready
     }
 };
+
+export const playRobotSound = () => {
+    try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        // Som "Chirp" ou "Bloop" metálico
+        osc.type = 'square'; // Onda quadrada para som 8-bit/mecânico
+        
+        // Frequência modulada rápida
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.1);
+        osc.frequency.linearRampToValueAtTime(1200, ctx.currentTime + 0.2);
+
+        // Envelope curto
+        gainNode.gain.setValueAtTime(0, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {
+        // Ignora erros de áudio
+    }
+};

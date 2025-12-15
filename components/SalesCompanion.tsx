@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { BookContext } from '../context/BookContext';
+import { playRobotSound } from '../utils/audio';
 
 type CompanionState = 'idle' | 'promoting_ad' | 'promoting_book' | 'moving';
 
@@ -42,18 +43,21 @@ const SalesCompanion: React.FC = () => {
             
             // 30% chance de mover, 35% Ad, 35% Livro
             if (randomChoice < 0.3) {
+                playRobotSound(); // Som ao mover
                 changePosition();
                 setCurrentState('moving');
                 setMessage('');
                 setActiveItem(null);
             } else if (randomChoice < 0.65 && banners.length > 0) {
                 // Mostrar Anúncio
+                playRobotSound(); // Som ao mostrar item
                 const randomBanner = banners[Math.floor(Math.random() * banners.length)];
                 setActiveItem(randomBanner);
                 setCurrentState('promoting_ad');
                 setMessage(adPhrases[Math.floor(Math.random() * adPhrases.length)]);
             } else if (books.length > 0) {
                 // Mostrar Livro
+                playRobotSound(); // Som ao mostrar item
                 const randomBook = books[Math.floor(Math.random() * books.length)];
                 setActiveItem(randomBook);
                 setCurrentState('promoting_book');
@@ -79,12 +83,14 @@ const SalesCompanion: React.FC = () => {
     };
 
     const handleDismiss = () => {
+        playRobotSound(); // Som ao fechar
         setIsVisible(false);
         // Reaparece após 2 minutos (120000 ms)
         setTimeout(() => {
             setIsVisible(true);
             setCurrentState('moving'); // Volta se movendo para chamar atenção suavemente
             changePosition();
+            playRobotSound(); // Som ao reaparecer
         }, 120000);
     };
 
@@ -110,8 +116,9 @@ const SalesCompanion: React.FC = () => {
                 {/* --- BOTÃO FECHAR --- */}
                 <button 
                     onClick={handleDismiss}
-                    className="absolute -top-6 -right-6 w-6 h-6 bg-red-900/80 text-white rounded-full flex items-center justify-center text-xs border border-red-500 opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity z-50 cursor-pointer shadow-lg"
+                    className="absolute -top-6 -right-6 w-8 h-8 bg-red-900 text-white rounded-full flex items-center justify-center text-sm border border-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 cursor-pointer shadow-lg hover:bg-red-700 pointer-events-auto"
                     title="Dispensar por 2 minutos"
+                    aria-label="Dispensar robô"
                 >
                     ✕
                 </button>
