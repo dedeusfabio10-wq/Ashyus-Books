@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Substitua pelo domínio real quando publicar
+Sitemap: https://www.ashyusbooks.com.br/sitemap.xml

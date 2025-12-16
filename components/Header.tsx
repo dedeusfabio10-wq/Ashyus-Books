@@ -1,15 +1,14 @@
-
-import React, { useState, MouseEvent, Dispatch, SetStateAction } from 'react';
+import React, { useState, MouseEvent } from 'react';
 import { Page } from '../App';
 import Logo from './Logo';
 
 interface HeaderProps {
     currentPage: Page;
-    setCurrentPage: Dispatch<SetStateAction<Page>>;
+    setCurrentPage: (page: Page) => void;
     onAdminClick: () => void;
 }
 
-const NavLink: React.FC<{ page: Page; currentPage: Page; setCurrentPage: Dispatch<SetStateAction<Page>>; children: React.ReactNode }> = ({ page, currentPage, setCurrentPage, children }) => (
+const NavLink: React.FC<{ page: Page; currentPage: Page; setCurrentPage: (page: Page) => void; children: React.ReactNode }> = ({ page, currentPage, setCurrentPage, children }) => (
     <button 
         onClick={() => setCurrentPage(page)}
         className={`px-3 py-2 text-sm md:text-base font-medium rounded-md transition-all duration-300 tracking-wide ${

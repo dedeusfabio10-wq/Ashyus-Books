@@ -23,19 +23,68 @@ const pageTitles = {
     blog: 'Lançamentos - Crônicas da Fantasia',
 }
 
+const pageDescriptions = {
+    home: "Bem-vindo às Crônicas da Fantasia. Explore mundos sombrios e romances intensos criados por Ashyus.",
+    books: "Biblioteca completa de Ashyus Books. Sinopses, capítulos gratuitos e links para compra.",
+    about: "Conheça Ashyus, o autor por trás das histórias de Dark Fantasy e Mistério.",
+    blog: "Fique por dentro dos próximos lançamentos e novidades do universo Ashyus.",
+}
+
 const App: React.FC = () => {
-    const [currentPage, setCurrentPage] = useState<Page>('home');
+    // Inicializa a página baseada na URL atual (suporte para Sitemap)
+    const getInitialPage = (): Page => {
+        const path = window.location.pathname.replace('/', '');
+        if (path === 'books') return 'books';
+        if (path === 'about') return 'about';
+        if (path === 'blog') return 'blog';
+        return 'home';
+    };
+
+    const [currentPage, setCurrentPage] = useState<Page>(getInitialPage());
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
     const [showIntro, setShowIntro] = useState(true);
-    // Ref para rastrear se a primeira interação já ocorreu para evitar som na montagem inicial antes do intro
     const hasInteracted = useRef(false);
 
     const openAdminModal = useCallback(() => setIsAdminModalOpen(true), []);
     const closeAdminModal = useCallback(() => setIsAdminModalOpen(false), []);
     
-    // Efeito para trocar o título
+    // Função para mudar página que atualiza também a URL (SEO Friendly)
+    const handlePageChange = (page: Page) => {
+        setCurrentPage(page);
+        
+        // Atualiza URL sem recarregar
+        const path = page === 'home' ? '/' : `/${page}`;
+        window.history.pushState({ page }, '', path);
+    };
+
+    // Listener para o botão "Voltar" do navegador
     useEffect(() => {
+        const handlePopState = () => {
+            setCurrentPage(getInitialPage());
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
+    // Efeito para trocar o Título e Meta Description (SEO Dinâmico)
+    useEffect(() => {
+        // Título
         document.title = pageTitles[currentPage] || 'Crônicas da Fantasia';
+        
+        // Meta Description
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+            metaDesc.setAttribute('content', pageDescriptions[currentPage] || pageDescriptions.home);
+        }
+
+        // Canonical URL
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) {
+            const baseUrl = window.location.origin;
+            const path = currentPage === 'home' ? '' : `/${currentPage}`;
+            canonical.setAttribute('href', `${baseUrl}${path}`);
+        }
+
     }, [currentPage]);
 
     // Efeito para tocar som na troca de página
@@ -76,7 +125,7 @@ const App: React.FC = () => {
 
                 <Header 
                     currentPage={currentPage} 
-                    setCurrentPage={setCurrentPage} 
+                    setCurrentPage={handlePageChange} 
                     onAdminClick={openAdminModal}
                 />
                 
