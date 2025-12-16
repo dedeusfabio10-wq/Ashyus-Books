@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-# Substitua pelo domínio real quando publicar
-Sitemap: https://www.ashyusbooks.com.br/sitemap.xml
+Sitemap: https://www.cronicasdafantasia.com.br/sitemap.xml
