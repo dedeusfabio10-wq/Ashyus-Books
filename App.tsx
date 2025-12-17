@@ -12,22 +12,23 @@ import MobileAdBanner from './components/MobileAdBanner';
 import SalesCompanion from './components/SalesCompanion';
 import IntroOverlay from './components/IntroOverlay';
 import AtmosphericEvents from './components/AtmosphericEvents';
+import SEOManager from './components/SEOManager';
 import { playPageTurnSound } from './utils/audio';
 
 export type Page = 'home' | 'books' | 'about' | 'blog';
 
 const pageTitles = {
-    home: 'Crônicas da Fantasia - Home',
-    books: 'Biblioteca - Crônicas da Fantasia',
-    about: 'O Autor - Ashyus Books',
-    blog: 'Lançamentos - Crônicas da Fantasia',
+    home: 'Crônicas da Fantasia | Ashyus Books - Dark Fantasy e Romance',
+    books: 'Biblioteca de Livros | Ashyus Books - Sinopses e Capítulos',
+    about: 'Quem é Ashyus? | Biografia do Autor de Dark Fantasy',
+    blog: 'Blog e Lançamentos | Novidades do Universo Ashyus',
 }
 
 const pageDescriptions = {
-    home: "Bem-vindo às Crônicas da Fantasia. Explore mundos sombrios e romances intensos criados por Ashyus.",
-    books: "Biblioteca completa de Ashyus Books. Sinopses, capítulos gratuitos e links para compra.",
-    about: "Conheça Ashyus, o autor por trás das histórias de Dark Fantasy e Mistério.",
-    blog: "Fique por dentro dos próximos lançamentos e novidades do universo Ashyus.",
+    home: "Portal oficial do autor Ashyus. Explore best-sellers de Dark Fantasy, Romance Sombrio e Mistério. Entre no reino onde a luz e a sombra colidem.",
+    books: "Leia sinopses completas, primeiros capítulos gratuitos e compre os livros da saga Crônicas da Fantasia. Disponível na Amazon e Kindle Unlimited.",
+    about: "Conheça a história de Ashyus, o autor brasileiro que está redefinindo a fantasia sombria com narrativas profundas e personagens inesquecíveis.",
+    blog: "Fique atualizado com as últimas notícias, datas de lançamento de livros, eventos de autógrafos e contos exclusivos do blog de Ashyus.",
 }
 
 const App: React.FC = () => {
@@ -55,6 +56,9 @@ const App: React.FC = () => {
         // Atualiza URL sem recarregar
         const path = page === 'home' ? '/' : `/${page}`;
         window.history.pushState({ page }, '', path);
+        
+        // Scroll para o topo para garantir que o Google veja o início do conteúdo
+        window.scrollTo(0, 0);
     };
 
     // Listener para o botão "Voltar" do navegador
@@ -68,10 +72,10 @@ const App: React.FC = () => {
 
     // Efeito para trocar o Título e Meta Description (SEO Dinâmico)
     useEffect(() => {
-        // Título
+        // Título Otimizado
         document.title = pageTitles[currentPage] || 'Crônicas da Fantasia';
         
-        // Meta Description
+        // Meta Description Otimizada
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
             metaDesc.setAttribute('content', pageDescriptions[currentPage] || pageDescriptions.home);
@@ -116,6 +120,9 @@ const App: React.FC = () => {
 
     return (
         <BookProvider>
+            {/* Gerenciador de SEO Invisível */}
+            <SEOManager currentPage={currentPage} />
+
             {showIntro && <IntroOverlay onComplete={handleIntroComplete} />}
             
             <div className={`flex flex-col min-h-screen bg-transparent transition-opacity duration-1000 ${showIntro ? 'opacity-0' : 'opacity-100'} relative`}>

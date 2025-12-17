@@ -1,16 +1,24 @@
-
 import React, { useContext } from 'react';
 import { BookContext } from '../context/BookContext';
+
+const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => (
+    <div className="bg-slate-800/30 border border-white/5 rounded-lg p-6 hover:border-brand-gold/30 transition-colors">
+        <h3 className="text-brand-gold font-bold font-serif text-lg mb-2">{question}</h3>
+        <p className="text-gray-300 text-sm leading-relaxed">{answer}</p>
+    </div>
+);
 
 const AboutPage: React.FC = () => {
     const { authorPhoto } = useContext(BookContext);
 
     return (
-        <div className="max-w-4xl mx-auto animate-fade-in">
+        <div className="max-w-4xl mx-auto animate-fade-in pb-12">
             <header className="text-center mb-12">
                 <h1 className="font-serif text-4xl md:text-5xl font-bold text-brand-lighter">Sobre o Autor</h1>
             </header>
-            <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+            
+            {/* Seção Bio */}
+            <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center mb-20">
                 <div className="md:w-1/3 w-2/3 flex-shrink-0">
                     <img 
                         src={authorPhoto} 
@@ -30,6 +38,29 @@ const AboutPage: React.FC = () => {
                     </p>
                 </div>
             </div>
+
+            {/* Seção FAQ - CRÍTICA PARA SEO (Rich Snippets) */}
+            <section className="border-t border-white/5 pt-12">
+                <h2 className="font-serif text-3xl text-white text-center mb-8">Perguntas Frequentes</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FAQItem 
+                        question="Qual a ordem de leitura dos livros?" 
+                        answer="Embora a maioria dos livros possa ser lida de forma independente, recomenda-se começar pela saga principal (listada na página Livros) para entender a mitologia completa do universo Ashyus."
+                    />
+                    <FAQItem 
+                        question="Onde posso comprar os livros físicos?" 
+                        answer="Atualmente, os livros estão disponíveis principalmente em formato digital (eBook) na Amazon e Kindle Unlimited. Edições físicas limitadas são anunciadas em ocasiões especiais através da Newsletter."
+                    />
+                    <FAQItem 
+                        question="O autor é brasileiro?" 
+                        answer="Sim, Ashyus é um autor brasileiro. Suas obras valorizam a literatura nacional de fantasia, competindo em qualidade e profundidade com grandes nomes internacionais do gênero Dark Fantasy."
+                    />
+                    <FAQItem 
+                        question="Como faço parcerias ou solicito ARC?" 
+                        answer="Para solicitações de parcerias com blogs literários, bookgrams ou envio de ARCs (Advanced Reader Copies), entre em contato diretamente pelo Instagram oficial ou aguarde os formulários de inscrição na Newsletter."
+                    />
+                </div>
+            </section>
         </div>
     );
 };

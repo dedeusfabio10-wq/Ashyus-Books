@@ -8,18 +8,29 @@ interface HeaderProps {
     onAdminClick: () => void;
 }
 
-const NavLink: React.FC<{ page: Page; currentPage: Page; setCurrentPage: (page: Page) => void; children: React.ReactNode }> = ({ page, currentPage, setCurrentPage, children }) => (
-    <button 
-        onClick={() => setCurrentPage(page)}
-        className={`px-3 py-2 text-sm md:text-base font-medium rounded-md transition-all duration-300 tracking-wide ${
-            currentPage === page 
-            ? 'text-brand-gold bg-white/5 shadow-sm shadow-brand-gold/10' 
-            : 'text-gray-300 hover:text-white hover:bg-white/5'
-        }`}
-    >
-        {children}
-    </button>
-);
+// O componente NavLink agora usa a tag <a> real para SEO, mas previne o reload padrão
+const NavLink: React.FC<{ page: Page; currentPage: Page; setCurrentPage: (page: Page) => void; children: React.ReactNode }> = ({ page, currentPage, setCurrentPage, children }) => {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault(); // Evita recarregar a página
+        setCurrentPage(page);
+    };
+
+    const href = page === 'home' ? '/' : `/${page}`;
+
+    return (
+        <a 
+            href={href}
+            onClick={handleClick}
+            className={`px-3 py-2 text-sm md:text-base font-medium rounded-md transition-all duration-300 tracking-wide ${
+                currentPage === page 
+                ? 'text-brand-gold bg-white/5 shadow-sm shadow-brand-gold/10' 
+                : 'text-gray-300 hover:text-white hover:bg-white/5'
+            }`}
+        >
+            {children}
+        </a>
+    );
+};
 
 
 const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage, onAdminClick }) => {
@@ -48,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage, onAdminCli
                     <div 
                         className="flex items-center gap-3 cursor-pointer group select-none"
                         onClick={handleTitleClick}
-                        title="Clique 5 vezes para abrir o painel de admin"
+                        title="Ashyus Books Home"
                     >
                         <Logo className="w-10 h-10 md:w-12 md:h-12 text-brand-gold transition-transform duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                         <div className="flex flex-col items-center md:items-start">
@@ -60,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage, onAdminCli
                             </span>
                         </div>
                     </div>
-                    <nav className="flex items-center space-x-1 md:space-x-2">
+                    <nav className="flex items-center space-x-1 md:space-x-2" role="navigation" aria-label="Menu Principal">
                         <NavLink page="home" currentPage={currentPage} setCurrentPage={setCurrentPage}>Home</NavLink>
                         <NavLink page="books" currentPage={currentPage} setCurrentPage={setCurrentPage}>Livros</NavLink>
                         <NavLink page="about" currentPage={currentPage} setCurrentPage={setCurrentPage}>Sobre</NavLink>

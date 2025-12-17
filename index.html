@@ -27,50 +27,12 @@
     <meta name="twitter:description" content="Portal oficial de Dark Fantasy. Mergulhe em histórias de luz e sombra." />
     <meta name="twitter:image" content="https://picsum.photos/seed/ashyus_social/1200/630" />
 
-    <!-- Google Structured Data (JSON-LD) para prioridade na busca -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Person",
-          "name": "Ashyus",
-          "url": "https://www.cronicasdafantasia.com.br",
-          "image": "https://picsum.photos/seed/author_ashyus/600/600",
-          "sameAs": [
-            "https://www.instagram.com/cronicasdafantasia",
-            "https://x.com/ashyusdark",
-            "https://amazon.com/author/ashyus"
-          ],
-          "jobTitle": "Autor de Fantasia",
-          "worksFor": {
-            "@type": "Organization",
-            "name": "Ashyus Books"
-          }
-        },
-        {
-          "@type": "WebSite",
-          "url": "https://www.cronicasdafantasia.com.br",
-          "name": "Crônicas da Fantasia",
-          "description": "Blog literário e portal oficial dos livros de Ashyus.",
-          "publisher": {
-            "@type": "Organization",
-            "name": "Ashyus Books",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://www.cronicasdafantasia.com.br/logo.png"
-            }
-          }
-        }
-      ]
-    }
-    </script>
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Performance Optimization: Preconnect & Preload Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -102,6 +64,13 @@
                 'infinite-scroll-up': 'scrollUp 40s linear infinite',
                 'infinite-scroll-down': 'scrollDown 40s linear infinite',
                 'infinite-scroll-left': 'scrollLeft 30s linear infinite',
+                // Dragon Animations
+                'dragon-flap': 'dragonFlap 0.5s ease-in-out infinite alternate',
+                'claw-strike': 'clawStrike 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                'screen-shake': 'screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                'fire-stream': 'fireStream 0.5s linear infinite',
+                'fire-pulse': 'firePulse 0.2s ease-in-out infinite alternate',
+                'fly-path': 'flyPath 4s ease-out forwards',
             },
             keyframes: {
                 fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -115,10 +84,38 @@
                 floatSlow: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } },
                 breathe: { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.05)' } },
                 spin: { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } },
-                // Animações de Scroll Infinito
                 scrollUp: { '0%': { transform: 'translateY(0)' }, '100%': { transform: 'translateY(-50%)' } },
                 scrollDown: { '0%': { transform: 'translateY(-50%)' }, '100%': { transform: 'translateY(0)' } },
                 scrollLeft: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
+                // Dragon Keyframes
+                dragonFlap: {
+                    '0%': { transform: 'rotateX(0deg) skewX(0deg)' },
+                    '100%': { transform: 'rotateX(60deg) skewX(-10deg)' }
+                },
+                flyPath: {
+                    '0%': { top: '5vh', left: '100vw', transform: 'scale(0.8) rotate(10deg)' },
+                    '50%': { top: '15vh', left: '50vw', transform: 'scale(1.2) rotate(-5deg)' },
+                    '100%': { top: '10px', left: '20px', transform: 'scale(1) rotate(0deg)' }
+                },
+                clawStrike: {
+                    '0%': { transform: 'translate(-50%, -50%) scale(1)', opacity: '1' },
+                    '50%': { transform: 'translate(-50%, -50%) scale(10)' },
+                    '100%': { transform: 'translate(-50%, -50%) scale(30)', opacity: '0' }
+                },
+                screenShake: {
+                    '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                    '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                    '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                    '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                },
+                fireStream: {
+                    '0%': { strokeDasharray: '0, 100', strokeDashoffset: '0' },
+                    '100%': { strokeDasharray: '100, 0', strokeDashoffset: '-100' }
+                },
+                firePulse: {
+                    '0%': { opacity: '0.8', filter: 'blur(2px)' },
+                    '100%': { opacity: '1', filter: 'blur(4px)' }
+                }
             },
             backgroundImage: {
                 'hero-pattern': "radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 60%, #020617 100%)",
