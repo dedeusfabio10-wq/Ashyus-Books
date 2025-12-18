@@ -65,18 +65,27 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setError(null);
         
         if (!supabase) {
+            console.error("Supabase Client não inicializado. Verifique as chaves VITE_ no ambiente.");
+            setError("Configuração de conexão ausente (VITE_SUPABASE_URL).");
             setIsInitialized(true);
             setLoading(false);
             return;
         }
 
         try {
+            // Buscando Livros
             const { data: booksData, error: booksError } = await supabase
                 .from('books')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (booksError) throw booksError;
+            if (booksError) {
+                console.warn("Erro ao buscar livros:", booksError.message);
+                // Se o erro for 'relation does not exist', o usuário precisa rodar o SQL
+                if (booksError.code === 'PGRST116' || booksError.message.includes('relation')) {
+                    throw new Error("Tabela 'books' não encontrada no banco.");
+                }
+            }
             
             const mappedBooks: Book[] = (booksData || []).map((b: any) => ({
                 id: b.id,
@@ -93,11 +102,12 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }));
             setBooks(mappedBooks);
 
+            // Buscando Banners
             const { data: bannersData, error: bannersError } = await supabase
                 .from('banners')
                 .select('*');
             
-            if (bannersError) throw bannersError;
+            if (bannersError) console.warn("Erro ao buscar banners:", bannersError.message);
 
             const mappedBanners: Banner[] = (bannersData || []).map((b: any) => ({
                 id: b.id,
@@ -108,12 +118,13 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }));
             setBanners(mappedBanners);
 
+            // Buscando Lançamentos
             const { data: releasesData, error: releasesError } = await supabase
                 .from('releases')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (releasesError) throw releasesError;
+            if (releasesError) console.warn("Erro ao buscar lançamentos:", releasesError.message);
 
             const mappedReleases: Release[] = (releasesData || []).map((r: any) => ({
                 id: r.id,
@@ -124,19 +135,24 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }));
             setReleases(mappedReleases);
 
-            const { data: settingsData } = await supabase
-                .from('site_settings')
-                .select('*')
-                .eq('key', 'author_photo')
-                .single();
+            // Buscando Foto do Autor
+            try {
+                const { data: settingsData } = await supabase
+                    .from('site_settings')
+                    .select('*')
+                    .eq('key', 'author_photo')
+                    .single();
 
-            if (settingsData && settingsData.value) {
-                setAuthorPhoto(settingsData.value);
+                if (settingsData && settingsData.value) {
+                    setAuthorPhoto(settingsData.value);
+                }
+            } catch (e) {
+                // Configuração opcional, não trava o app
             }
 
-        } catch (err) {
-            console.error("Erro na inicialização Supabase:", err);
-            setError("Não foi possível conectar à biblioteca arcana.");
+        } catch (err: any) {
+            console.error("Erro Crítico Supabase:", err);
+            setError(`Falha na conexão: ${err.message || "Tente recarregar a página."}`);
         } finally {
             setLoading(false);
             setIsInitialized(true);
@@ -195,8 +211,8 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             };
 
             setBooks(prev => [newBook, ...prev]);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Erro desconhecido.");
+        } catch (err: any) {
+            setError(`Erro ao salvar: ${err.message}`);
             throw err;
         } finally {
             setLoading(false);
@@ -225,9 +241,9 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (error) throw error;
             }
             setBooks(prev => prev.map(book => book.id === bookId ? { ...book, ...updates } : book));
-        } catch (err) {
+        } catch (err: any) {
             console.error("Erro ao atualizar livro:", err);
-            alert("Erro ao atualizar dados do livro.");
+            alert(`Erro ao atualizar: ${err.message}`);
         } finally {
             setLoading(false);
         }
