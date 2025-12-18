@@ -1,5 +1,5 @@
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -10,16 +10,16 @@ interface State {
   error: Error | null;
 }
 
-// Explicitly import and extend Component with generic Props and State to ensure TS property recognition
-class ErrorBoundary extends Component<Props, State> {
-  // Declare and initialize state at the class level for robust TypeScript property recognition
-  public state: State = {
-    hasError: false,
-    error: null
-  };
-
+// Fix: Using React.Component explicitly to ensure property inheritance like 'props' and 'state' 
+// are correctly recognized by the TypeScript compiler in the current environment.
+class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
+    // Standard state initialization for robust type recognition
+    this.state = {
+      hasError: false,
+      error: null
+    };
   }
   
   public static getDerivedStateFromError(error: Error): State {
@@ -31,7 +31,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
-    // Correctly accessing 'state' inherited from Component<Props, State>
+    // Accessing inherited 'state' from React.Component
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-8 font-sans">
@@ -54,7 +54,7 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    // Correctly accessing 'props' inherited from Component<Props, State>
+    // Accessing inherited 'props' from React.Component
     return this.props.children;
   }
 }
