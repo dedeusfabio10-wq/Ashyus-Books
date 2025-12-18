@@ -1,5 +1,5 @@
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -10,13 +10,16 @@ interface State {
   error: Error | null;
 }
 
-// Fixed inheritance and property recognition by using standard React component pattern
-class ErrorBoundary extends Component<Props, State> {
-  // Use property initializer for state to resolve potential typing issues with manual declarations that shadow inherited members
-  public state: State = {
-    hasError: false,
-    error: null
-  };
+// Fixed inheritance and property recognition by using standard React component pattern with explicit constructor
+class ErrorBoundary extends React.Component<Props, State> {
+  // Initialize state in constructor to ensure 'this' context and inheritance are correctly handled by TypeScript
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
   
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -27,7 +30,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
-    // Accessing this.state which is correctly initialized as a class property
+    // Accessing this.state which is correctly initialized in the constructor
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-8 font-sans">

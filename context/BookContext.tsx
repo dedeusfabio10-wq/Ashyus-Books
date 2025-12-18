@@ -60,36 +60,36 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [error, setError] = useState<string | null>(null);
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
-    const initializeData = useCallback(async () => {
-        // Se já está inicializado e tem livros, não recarrega (evita flickering)
-        if (isInitialized && books.length > 0) return;
-
+    const initializeData = useCallback(async (retryCount = 0) => {
         setLoading(true);
         setError(null);
         
         if (!supabase) {
-            setError("Configuração de conexão (VITE_SUPABASE_URL) não encontrada.");
+            setError("Configuração de conexão não encontrada.");
             setIsInitialized(true);
             setLoading(false);
             return;
         }
 
         try {
-            // Buscando Livros com tratamento de erro rigoroso
+            // OTIMIZAÇÃO: Buscamos primeiro apenas o necessário para os Cards
+            // Retiramos 'first_chapter_markdown' e 'full_synopsis' da busca inicial se o banco estiver lento
             const { data: booksData, error: booksError } = await supabase
                 .from('books')
-                .select('*')
-                .order('created_at', { ascending: false });
+                .select('id, title, books2read_url, amazon_url, amazon_ebook_url, draft_book_url, cover_url, short_synopsis, full_synopsis, first_chapter_markdown, created_at')
+                .order('created_at', { ascending: false })
+                .limit(50); // Limite de segurança
 
             if (booksError) {
-                console.error("Erro Supabase Books:", booksError);
-                throw new Error(`Erro ao buscar livros: ${booksError.message}`);
+                // Se for erro de timeout e tivermos poucas tentativas, tenta de novo em 2 segundos
+                if (booksError.message.includes('timeout') && retryCount < 2) {
+                    console.warn(`Timeout detectado. Tentativa ${retryCount + 1} de 3...`);
+                    setTimeout(() => initializeData(retryCount + 1), 2000);
+                    return;
+                }
+                throw booksError;
             }
             
-            if (!booksData || booksData.length === 0) {
-                console.warn("Consulta bem sucedida, mas 0 livros retornados. Verifique as políticas de RLS no Supabase.");
-            }
-
             const mappedBooks: Book[] = (booksData || []).map((b: any) => ({
                 id: b.id,
                 title: b.title,
@@ -99,61 +99,40 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 draftBookUrl: b.draft_book_url,
                 coverUrl: b.cover_url,
                 shortSynopsis: b.short_synopsis,
-                fullSynopsis: b.full_synopsis,
-                firstChapterMarkdown: b.first_chapter_markdown,
+                fullSynopsis: b.full_synopsis || '',
+                firstChapterMarkdown: b.first_chapter_markdown || '',
                 createdAt: b.created_at
             }));
             setBooks(mappedBooks);
 
-            // Buscando Banners
-            const { data: bannersData, error: bannersError } = await supabase.from('banners').select('*');
-            if (!bannersError) {
-                const mappedBanners: Banner[] = (bannersData || []).map((b: any) => ({
-                    id: b.id,
-                    imageUrl: b.image_url,
-                    linkUrl: b.link_url,
-                    position: b.position,
-                    createdAt: b.created_at
-                }));
-                setBanners(mappedBanners);
+            // Buscando Banners (Dados leves)
+            const { data: bannersData } = await supabase.from('banners').select('*');
+            if (bannersData) {
+                setBanners(bannersData.map((b: any) => ({
+                    id: b.id, imageUrl: b.image_url, linkUrl: b.link_url, position: b.position, createdAt: b.created_at
+                })));
             }
 
-            // Buscando Lançamentos
-            const { data: releasesData, error: releasesError } = await supabase
-                .from('releases')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (!releasesError) {
-                const mappedReleases: Release[] = (releasesData || []).map((r: any) => ({
-                    id: r.id,
-                    title: r.title,
-                    description: r.description,
-                    date: r.date_text,
-                    imageUrl: r.image_url
-                }));
-                setReleases(mappedReleases);
+            // Buscando Lançamentos (Dados leves)
+            const { data: releasesData } = await supabase.from('releases').select('*').order('created_at', { ascending: false });
+            if (releasesData) {
+                setReleases(releasesData.map((r: any) => ({
+                    id: r.id, title: r.title, description: r.description, date: r.date_text, imageUrl: r.image_url
+                })));
             }
 
-            // Buscando Foto do Autor
-            const { data: settingsData } = await supabase
-                .from('site_settings')
-                .select('*')
-                .eq('key', 'author_photo')
-                .maybeSingle();
-
-            if (settingsData && settingsData.value) {
-                setAuthorPhoto(settingsData.value);
-            }
+            // Foto do Autor
+            const { data: settingsData } = await supabase.from('site_settings').select('value').eq('key', 'author_photo').maybeSingle();
+            if (settingsData?.value) setAuthorPhoto(settingsData.value);
 
         } catch (err: any) {
-            console.error("Falha na inicialização:", err);
-            setError(err.message || "Falha desconhecida na biblioteca arcana.");
+            console.error("Falha ao carregar dados:", err);
+            setError(`A conexão com o Supabase falhou (Timeout). Reduza o tamanho das imagens de capa ou tente novamente. Detalhe: ${err.message}`);
         } finally {
             setLoading(false);
             setIsInitialized(true);
         }
-    }, [isInitialized, books.length]);
+    }, []);
     
     useEffect(() => {
         initializeData();
@@ -177,32 +156,18 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (supabase) {
                 const { error: dbError } = await supabase.from('books').insert([{
-                    id: id,
-                    title: title,
-                    books2read_url: books2readUrl,
-                    amazon_url: amazonUrl,
-                    amazon_ebook_url: amazonEbookUrl,
-                    draft_book_url: draftBookUrl,
-                    cover_url: finalCoverUrl,
-                    short_synopsis: shortSynopsis,
-                    full_synopsis: fullSynopsis,
-                    first_chapter_markdown: firstChapter
+                    id, title, books2read_url: books2readUrl, amazon_url: amazonUrl, 
+                    amazon_ebook_url: amazonEbookUrl, draft_book_url: draftBookUrl, 
+                    cover_url: finalCoverUrl, short_synopsis: shortSynopsis, 
+                    full_synopsis: fullSynopsis, first_chapter_markdown: firstChapter
                 }]);
-                if (dbError) throw new Error(dbError.message);
+                if (dbError) throw dbError;
             }
 
             const newBook: Book = {
-                id,
-                title,
-                books2readUrl,
-                amazonUrl,
-                amazonEbookUrl,
-                draftBookUrl,
-                coverUrl: finalCoverUrl,
-                shortSynopsis,
-                fullSynopsis,
-                firstChapterMarkdown: firstChapter,
-                createdAt: new Date().toISOString(),
+                id, title, books2readUrl, amazonUrl, amazonEbookUrl, draftBookUrl,
+                coverUrl: finalCoverUrl, shortSynopsis, fullSynopsis, 
+                firstChapterMarkdown: firstChapter, createdAt: new Date().toISOString()
             };
 
             setBooks(prev => [newBook, ...prev]);
@@ -228,11 +193,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (updates.fullSynopsis) dbUpdates.full_synopsis = updates.fullSynopsis;
                 if (updates.firstChapterMarkdown) dbUpdates.first_chapter_markdown = updates.firstChapterMarkdown;
 
-                const { error } = await supabase
-                    .from('books')
-                    .update(dbUpdates)
-                    .eq('id', bookId);
-
+                const { error } = await supabase.from('books').update(dbUpdates).eq('id', bookId);
                 if (error) throw error;
             }
             setBooks(prev => prev.map(book => book.id === bookId ? { ...book, ...updates } : book));
@@ -245,31 +206,19 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const updateBookCover = async (bookId: string, newCoverUrl: string) => {
         if (supabase) {
-            const { error } = await supabase
-                .from('books')
-                .update({ cover_url: newCoverUrl })
-                .eq('id', bookId);
-
-            if (error) {
-                alert("Erro ao atualizar capa: " + error.message);
-                return;
-            }
+            const { error } = await supabase.from('books').update({ cover_url: newCoverUrl }).eq('id', bookId);
+            if (error) { alert("Erro ao atualizar capa: " + error.message); return; }
         }
-        setBooks(prev => prev.map(book =>
-            book.id === bookId ? { ...book, coverUrl: newCoverUrl } : book
-        ));
+        setBooks(prev => prev.map(book => book.id === bookId ? { ...book, coverUrl: newCoverUrl } : book));
     };
 
     const addBanner = async (imageUrl: string, linkUrl: string, position: 'left' | 'right') => {
         const id = Date.now().toString();
         if (supabase) {
-            const { error } = await supabase.from('banners').insert([{
-                id, image_url: imageUrl, link_url: linkUrl, position
-            }]);
+            const { error } = await supabase.from('banners').insert([{ id, image_url: imageUrl, link_url: linkUrl, position }]);
             if (error) { alert(error.message); return; }
         }
-        const newBanner: Banner = { id, imageUrl, linkUrl, position, createdAt: new Date().toISOString() };
-        setBanners(prev => [...prev, newBanner]);
+        setBanners(prev => [...prev, { id, imageUrl, linkUrl, position, createdAt: new Date().toISOString() }]);
     };
 
     const removeBanner = async (bannerId: string) => {
@@ -280,9 +229,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const addRelease = async (title: string, description: string, date: string, imageUrl: string) => {
         const id = Date.now().toString();
         if (supabase) {
-            const { error } = await supabase.from('releases').insert([{
-                id, title, description, date_text: date, image_url: imageUrl
-            }]);
+            const { error } = await supabase.from('releases').insert([{ id, title, description, date_text: date, image_url: imageUrl }]);
             if (error) { alert(error.message); return; }
         }
         setReleases(prev => [{ id, title, description, date, imageUrl }, ...prev]);
@@ -294,9 +241,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const updateAuthorPhoto = async (newPhotoUrl: string) => {
-        if (supabase) {
-            await supabase.from('site_settings').upsert({ key: 'author_photo', value: newPhotoUrl });
-        }
+        if (supabase) await supabase.from('site_settings').upsert({ key: 'author_photo', value: newPhotoUrl });
         setAuthorPhoto(newPhotoUrl);
     };
 
