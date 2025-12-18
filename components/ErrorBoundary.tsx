@@ -1,5 +1,5 @@
 
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -10,12 +10,12 @@ interface State {
   error: Error | null;
 }
 
-// Fix: Using React.Component explicitly to ensure property inheritance like 'props' and 'state' 
-// are correctly recognized by the TypeScript compiler in the current environment.
-class ErrorBoundary extends React.Component<Props, State> {
+// Fixed: Importing Component directly and extending it to resolve property access errors 
+// for 'state' and 'props' which were not being correctly inherited from React.Component in this environment.
+class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    // Standard state initialization for robust type recognition
+    // Fixed: Initializing state. TS should now recognize it as a member of Component.
     this.state = {
       hasError: false,
       error: null
@@ -31,7 +31,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public render() {
-    // Accessing inherited 'state' from React.Component
+    // Fixed: Accessing inherited 'state' property from Component
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-8 font-sans">
@@ -54,7 +54,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
-    // Accessing inherited 'props' from React.Component
+    // Fixed: Accessing inherited 'props' property from Component
     return this.props.children;
   }
 }
