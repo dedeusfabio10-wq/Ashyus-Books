@@ -29,7 +29,6 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
             });
 
             // --- Schema de Breadcrumb (Trilha de Navegação) ---
-            // O Google ama saber onde a página está na hierarquia
             schemas.push({
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
@@ -50,13 +49,12 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
             });
 
             if (currentPage === 'home') {
-                 // Home pode ter Organization mais detalhada
                  schemas.push({
                     "@context": "https://schema.org",
                     "@type": "Organization",
                     "name": "Ashyus Books",
                     "url": baseUrl,
-                    "logo": "https://www.cronicasdafantasia.com.br/logo.png", // Idealmente uma URL real
+                    "logo": "https://www.cronicasdafantasia.com.br/logo.png",
                     "sameAs": [
                         "https://www.instagram.com/cronicasdafantasia",
                         "https://x.com/ashyusdark"
@@ -64,7 +62,6 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
                  });
             } 
             else if (currentPage === 'books') {
-                // Schema de Lista de Livros (ItemList)
                 schemas.push({
                     "@context": "https://schema.org",
                     "@type": "ItemList",
@@ -88,14 +85,13 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
                                 "availability": "https://schema.org/InStock",
                                 "url": book.amazonUrl,
                                 "priceCurrency": "BRL",
-                                "price": "24.90" // Preço estimado ou dinâmico se tiver
+                                "price": "24.90"
                             } : undefined
                         }
                     }))
                 });
             }
             else if (currentPage === 'about') {
-                // Schema do Autor (Person)
                 schemas.push({
                     "@context": "https://schema.org",
                     "@type": "Person",
@@ -111,8 +107,6 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
                     ]
                 });
 
-                // FAQ Page Schema (Perguntas Frequentes na página Sobre)
-                // Isso gera Rich Snippets na busca!
                 schemas.push({
                     "@context": "https://schema.org",
                     "@type": "FAQPage",
@@ -145,7 +139,6 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
                 });
             }
             else if (currentPage === 'blog') {
-                // Schema de Blog (Blog) e Lançamentos
                 schemas.push({
                     "@context": "https://schema.org",
                     "@type": "Blog",
@@ -171,7 +164,6 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
                 });
             }
 
-            // Injeta o script no head (Remove anterior e cria novo para evitar duplicação)
             const scriptId = 'dynamic-json-ld';
             const existingScript = document.getElementById(scriptId);
             if (existingScript) {
@@ -185,7 +177,6 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
             document.head.appendChild(script);
         };
 
-        // 2. Atualiza Meta Keywords dinamicamente
         const updateKeywords = () => {
             const metaKeywords = document.querySelector('meta[name="keywords"]');
             if (metaKeywords) {

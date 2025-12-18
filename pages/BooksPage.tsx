@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { BookContext } from '../context/BookContext';
 import Loader from '../components/Loader';
@@ -9,61 +10,48 @@ const BooksPage: React.FC = () => {
     return (
         <div className="animate-fade-in space-y-24">
             <header className="text-center relative py-8">
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-purple-900/20 rounded-full blur-3xl -z-10"></div>
                 <h1 className="font-serif text-5xl md:text-6xl font-bold text-white mb-4">Biblioteca de Obras</h1>
                 <p className="text-xl text-gray-400 font-light tracking-wide">Mergulhe em cada história do universo Ashyus.</p>
             </header>
 
-            {loading && !isInitialized && <div className="text-center py-12"><Loader message="Catalogando a biblioteca..." /></div>}
-            {error && <p className="text-center text-red-400">{error}</p>}
+            {loading && !isInitialized && <div className="text-center py-12"><Loader message="Consultando os grimórios..." /></div>}
             
             {isInitialized && books.map((book, index) => (
-                <article key={book.id} className={`flex flex-col lg:flex-row gap-12 lg:gap-16 items-start animate-slide-up ${index > 0 ? 'pt-24 border-t border-white/5' : ''}`}>
-                    <div className="lg:w-1/3 w-full sm:w-2/3 sm:mx-auto flex-shrink-0 relative group">
-                        <div className="absolute inset-0 bg-brand-gold/10 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10"></div>
-                        <img 
-                            src={book.coverUrl} 
-                            alt={`Capa completa do livro ${book.title} - Dark Fantasy`} 
-                            loading={index === 0 ? "eager" : "lazy"} // Apenas a primeira carrega rápido (LCP), as outras lazy
-                            className="rounded-xl shadow-2xl shadow-black/50 w-full transform group-hover:scale-[1.02] transition-transform duration-500" 
-                        />
+                <article key={book.id} className={`flex flex-col lg:flex-row gap-12 items-start animate-slide-up ${index > 0 ? 'pt-24 border-t border-white/5' : ''}`}>
+                    <div className="lg:w-1/3 w-full sm:w-2/3 mx-auto flex-shrink-0">
+                        <img src={book.coverUrl} alt={book.title} className="rounded-xl shadow-2xl w-full border border-white/10" />
                     </div>
                     <div className="lg:w-2/3 w-full">
-                        <h2 className="font-serif text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-gold-dark mb-6">{book.title}</h2>
-                        
-                        {/* Sinopse rica para SEO de texto */}
-                        <div className="prose prose-invert prose-lg text-gray-300 max-w-none mb-8 leading-relaxed">
+                        <h2 className="font-serif text-4xl font-bold text-brand-gold mb-6">{book.title}</h2>
+                        <div className="prose prose-invert max-w-none mb-8 text-gray-300">
                             <p className="whitespace-pre-wrap">{book.fullSynopsis}</p>
                         </div>
                         
-                        <div className="flex flex-wrap gap-4 mb-12">
+                        <div className="flex flex-wrap gap-4 mb-10">
                             {book.amazonUrl && (
-                                <a 
-                                    href={book.amazonUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="inline-block bg-brand-gold text-brand-dark font-bold py-3 px-8 rounded-full hover:bg-brand-gold-dark transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-brand-gold/20"
-                                >
-                                    Comprar na Amazon
+                                <a href={book.amazonUrl} target="_blank" rel="noopener" className="bg-brand-gold text-brand-dark font-bold py-3 px-6 rounded-full hover:bg-brand-gold-dark transition-all shadow-lg shadow-brand-gold/20">
+                                    Amazon (Físico)
                                 </a>
                             )}
-                            <a 
-                                href={book.books2readUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className={`inline-block font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:-translate-y-1 ${book.amazonUrl ? 'bg-transparent border border-white/20 text-white hover:bg-white/10' : 'bg-gradient-to-r from-brand-gold to-brand-gold-dark text-brand-dark hover:shadow-[0_0_20px_rgba(251,191,36,0.4)]'}`}
-                            >
-                                {book.amazonUrl ? 'Outras Lojas (Books2Read)' : 'Comprar Agora'}
+                            {book.amazonEbookUrl && (
+                                <a href={book.amazonEbookUrl} target="_blank" rel="noopener" className="bg-slate-700 text-white font-bold py-3 px-6 rounded-full hover:bg-slate-600 transition-all border border-brand-gold/30">
+                                    eBook Kindle
+                                </a>
+                            )}
+                            {book.draftBookUrl && (
+                                <a href={book.draftBookUrl} target="_blank" rel="noopener" className="bg-transparent border border-white/20 text-white py-3 px-6 rounded-full hover:bg-white/10 transition-all">
+                                    Livro na Draft
+                                </a>
+                            )}
+                            <a href={book.books2readUrl} target="_blank" rel="noopener" className="bg-transparent border border-white/10 text-gray-400 py-3 px-6 rounded-full hover:text-white transition-all">
+                                Outras Plataformas
                             </a>
                         </div>
 
-                        <div className="mt-8 bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-                            <h3 className="font-serif text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                                <span className="w-2 h-2 rounded-full bg-brand-gold"></span>
-                                Leia o Primeiro Capítulo
-                            </h3>
-                            <div className="max-h-96 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-brand-gold/20 scrollbar-track-transparent">
-                                <article className="text-gray-400 leading-relaxed font-serif text-lg">
+                        <div className="bg-slate-900/50 rounded-2xl p-6 border border-white/5">
+                            <h3 className="font-serif text-2xl font-bold text-white mb-4">Degustação: Capítulo 1</h3>
+                            <div className="max-h-80 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-brand-gold/20">
+                                <article className="text-gray-400 font-serif text-lg leading-relaxed italic">
                                     <MarkdownRenderer text={book.firstChapterMarkdown} />
                                 </article>
                             </div>

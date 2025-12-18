@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, GenerateContentResponse, Type } from "@google/genai";
 import { Book } from '../types';
 
@@ -11,8 +12,9 @@ export const generateBookDetails = async (title: string): Promise<GeneratedBookD
     const prompt = `Para o livro com o título '${title}', crie um conteúdo para um site de autor. O estilo deve ser dark fantasy elegante. Forneça sua resposta como um objeto JSON VÁLIDO e nada mais, sem formatação extra ou markdown. O objeto JSON deve ter as seguintes chaves: "fullSynopsis" (uma sinopse completa e envolvente com cerca de 3-4 parágrafos), "shortSynopsis" (uma sinopse curta e impactante de no máximo 3 linhas), e "firstChapterMarkdown" (o primeiro capítulo fictício do livro, escrito em markdown, com cerca de 500 palavras, contendo parágrafos e diálogos).`;
 
     try {
+        // DO update model to 'gemini-3-flash-preview' for basic text tasks as per guidelines
         const response: GenerateContentResponse = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",

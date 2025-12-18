@@ -4,6 +4,8 @@ export interface Book {
   title: string;
   books2readUrl: string;
   amazonUrl?: string;
+  amazonEbookUrl?: string;
+  draftBookUrl?: string;
   coverUrl: string;
   shortSynopsis: string;
   fullSynopsis: string;

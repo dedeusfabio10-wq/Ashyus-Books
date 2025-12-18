@@ -2,18 +2,21 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <!-- Força o navegador a fazer upgrade de qualquer requisição HTTP para HTTPS automaticamente -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    
     <!-- Favicon gerado via SVG Data URI -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230f172a' stroke='%23fbbf24' stroke-width='2'/%3E%3Cpath d='M20 75C20 75 35 82 50 78C65 82 80 75 80 75V45C80 45 65 52 50 48C35 52 20 45 20 45V75Z' fill='%231e293b' stroke='%23fbbf24' stroke-width='3'/%3E%3Cpath d='M50 50C50 50 60 35 50 15C40 35 50 50 50 50Z' fill='%23fbbf24'/%3E%3C/svg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- SEO Primário -->
+    <!-- SEO Primário - URLs agora são HTTPS -->
     <title>Crônicas da Fantasia | Ashyus Books - Dark Fantasy e Romance</title>
     <meta name="description" content="Portal oficial do autor Ashyus. Descubra livros de Dark Fantasy, Romance Sombrio e Mistério. Leia capítulos gratuitos, veja lançamentos e mergulhe nas Crônicas da Fantasia." />
     <meta name="keywords" content="Ashyus Books, Dark Fantasy, Romance, Livros de Fantasia, Autor Brasileiro, Literatura Fantástica, Mistério" />
     <meta name="author" content="Ashyus" />
     <link rel="canonical" href="https://www.cronicasdafantasia.com.br" />
     
-    <!-- Open Graph / Facebook / WhatsApp -->
+    <!-- Open Graph / Facebook / WhatsApp - URLs HTTPS -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.cronicasdafantasia.com.br" />
     <meta property="og:title" content="Crônicas da Fantasia | O Universo de Ashyus" />
@@ -27,9 +30,10 @@
     <meta name="twitter:description" content="Portal oficial de Dark Fantasy. Mergulhe em histórias de luz e sombra." />
     <meta name="twitter:image" content="https://picsum.photos/seed/ashyus_social/1200/630" />
 
-    <!-- Performance Optimization: Preconnect & Preload Fonts -->
+    <!-- Performance Optimization: Preconnect & Preload -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://vjylpdxmxmzzrxhzxrxt.supabase.co" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -50,8 +54,8 @@
               'brand-gold-dark': '#d97706',
             },
             animation: {
-                'fade-in': 'fadeIn 0.8s ease-out',
-                'slide-up': 'slideUp 0.8s ease-out',
+                'fade-in': 'fadeIn 0.6s ease-out',
+                'slide-up': 'slideUp 0.6s ease-out',
                 'fog-flow': 'fogFlow 20s linear infinite',
                 'fly-diagonal': 'flyDiagonal 15s linear forwards',
                 'fly-straight': 'flyStraight 20s linear forwards',
@@ -64,7 +68,6 @@
                 'infinite-scroll-up': 'scrollUp 40s linear infinite',
                 'infinite-scroll-down': 'scrollDown 40s linear infinite',
                 'infinite-scroll-left': 'scrollLeft 30s linear infinite',
-                // Dragon Animations
                 'dragon-flap': 'dragonFlap 0.5s ease-in-out infinite alternate',
                 'claw-strike': 'clawStrike 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards',
                 'screen-shake': 'screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both',
@@ -74,7 +77,7 @@
             },
             keyframes: {
                 fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                slideUp: { '0%': { transform: 'translateY(30px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
                 fogFlow: { '0%': { transform: 'translateX(-10%)' }, '50%': { transform: 'translateX(10%)' }, '100%': { transform: 'translateX(-10%)' } },
                 flyDiagonal: { '0%': { transform: 'translate(-10vw, 10vh) scale(0.8)', opacity: '0' }, '10%': { opacity: '0.4' }, '90%': { opacity: '0.4' }, '100%': { transform: 'translate(110vw, -20vh) scale(0.8)', opacity: '0' } },
                 flyStraight: { '0%': { transform: 'translate(-20vw, 0) rotate(5deg)', opacity: '0' }, '10%': { opacity: '0.3' }, '90%': { opacity: '0.3' }, '100%': { transform: 'translate(120vw, 10vh) rotate(5deg)', opacity: '0' } },
@@ -87,7 +90,6 @@
                 scrollUp: { '0%': { transform: 'translateY(0)' }, '100%': { transform: 'translateY(-50%)' } },
                 scrollDown: { '0%': { transform: 'translateY(-50%)' }, '100%': { transform: 'translateY(0)' } },
                 scrollLeft: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
-                // Dragon Keyframes
                 dragonFlap: {
                     '0%': { transform: 'rotateX(0deg) skewX(0deg)' },
                     '100%': { transform: 'rotateX(60deg) skewX(-10deg)' }
@@ -139,6 +141,12 @@
 }
 </script>
     <style>
+        /* Otimização de Performance: Hardware Acceleration */
+        .fog-container, .animate-fly-path, .animate-float-slow, .animate-infinite-scroll-up, .animate-infinite-scroll-down {
+            will-change: transform;
+            transform: translateZ(0); /* Força uso da GPU */
+        }
+
         body::before {
             content: "";
             position: fixed;
@@ -154,7 +162,6 @@
   </head>
   <body class="bg-hero-pattern min-h-screen font-sans text-brand-light antialiased selection:bg-brand-gold selection:text-brand-dark overflow-x-hidden">
     <div id="root"></div>
-    <!-- Script Principal que inicia a aplicação React -->
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>

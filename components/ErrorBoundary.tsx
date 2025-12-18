@@ -1,4 +1,5 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -9,12 +10,16 @@ interface State {
   error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
+// Fix inheritance recognition by using named Component and explicit property declaration for state
+class ErrorBoundary extends Component<Props, State> {
+  // Explicitly declare and initialize state to resolve "Property 'state' does not exist" errors
   public state: State = {
     hasError: false,
     error: null
   };
 
+  // Constructor is omitted as state is initialized as a class property, ensuring it is correctly typed
+  
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
@@ -24,6 +29,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public render() {
+    // Accessing this.state which is now explicitly declared in the class scope
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-8 font-sans">
@@ -46,6 +52,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
+    // Accessing this.props which is inherited from Component<Props, State>
     return this.props.children;
   }
 }
