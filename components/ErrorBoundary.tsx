@@ -10,19 +10,13 @@ interface State {
   error: Error | null;
 }
 
-// Fix inheritance recognition by using standard constructor and state initialization
+// Fixed inheritance and property recognition by using standard React component pattern
 class ErrorBoundary extends Component<Props, State> {
-  // Explicitly declare state to resolve potential "Property 'state' does not exist" errors in strict environments
-  public state: State;
-
-  // Constructor is used to properly initialize inherited members like 'props' and 'state'
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null
-    };
-  }
+  // Use property initializer for state to resolve potential typing issues with manual declarations that shadow inherited members
+  public state: State = {
+    hasError: false,
+    error: null
+  };
   
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -33,7 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
-    // Accessing this.state which is correctly initialized in the constructor
+    // Accessing this.state which is correctly initialized as a class property
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-8 font-sans">

@@ -61,32 +61,35 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
     const initializeData = useCallback(async () => {
+        // Se já está inicializado e tem livros, não recarrega (evita flickering)
+        if (isInitialized && books.length > 0) return;
+
         setLoading(true);
         setError(null);
         
         if (!supabase) {
-            console.error("Supabase Client não inicializado. Verifique as chaves VITE_ no ambiente.");
-            setError("Configuração de conexão ausente (VITE_SUPABASE_URL).");
+            setError("Configuração de conexão (VITE_SUPABASE_URL) não encontrada.");
             setIsInitialized(true);
             setLoading(false);
             return;
         }
 
         try {
-            // Buscando Livros
+            // Buscando Livros com tratamento de erro rigoroso
             const { data: booksData, error: booksError } = await supabase
                 .from('books')
                 .select('*')
                 .order('created_at', { ascending: false });
 
             if (booksError) {
-                console.warn("Erro ao buscar livros:", booksError.message);
-                // Se o erro for 'relation does not exist', o usuário precisa rodar o SQL
-                if (booksError.code === 'PGRST116' || booksError.message.includes('relation')) {
-                    throw new Error("Tabela 'books' não encontrada no banco.");
-                }
+                console.error("Erro Supabase Books:", booksError);
+                throw new Error(`Erro ao buscar livros: ${booksError.message}`);
             }
             
+            if (!booksData || booksData.length === 0) {
+                console.warn("Consulta bem sucedida, mas 0 livros retornados. Verifique as políticas de RLS no Supabase.");
+            }
+
             const mappedBooks: Book[] = (booksData || []).map((b: any) => ({
                 id: b.id,
                 title: b.title,
@@ -103,61 +106,54 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setBooks(mappedBooks);
 
             // Buscando Banners
-            const { data: bannersData, error: bannersError } = await supabase
-                .from('banners')
-                .select('*');
-            
-            if (bannersError) console.warn("Erro ao buscar banners:", bannersError.message);
-
-            const mappedBanners: Banner[] = (bannersData || []).map((b: any) => ({
-                id: b.id,
-                imageUrl: b.image_url,
-                linkUrl: b.link_url,
-                position: b.position,
-                createdAt: b.created_at
-            }));
-            setBanners(mappedBanners);
+            const { data: bannersData, error: bannersError } = await supabase.from('banners').select('*');
+            if (!bannersError) {
+                const mappedBanners: Banner[] = (bannersData || []).map((b: any) => ({
+                    id: b.id,
+                    imageUrl: b.image_url,
+                    linkUrl: b.link_url,
+                    position: b.position,
+                    createdAt: b.created_at
+                }));
+                setBanners(mappedBanners);
+            }
 
             // Buscando Lançamentos
             const { data: releasesData, error: releasesError } = await supabase
                 .from('releases')
                 .select('*')
                 .order('created_at', { ascending: false });
-
-            if (releasesError) console.warn("Erro ao buscar lançamentos:", releasesError.message);
-
-            const mappedReleases: Release[] = (releasesData || []).map((r: any) => ({
-                id: r.id,
-                title: r.title,
-                description: r.description,
-                date: r.date_text,
-                imageUrl: r.image_url
-            }));
-            setReleases(mappedReleases);
+            
+            if (!releasesError) {
+                const mappedReleases: Release[] = (releasesData || []).map((r: any) => ({
+                    id: r.id,
+                    title: r.title,
+                    description: r.description,
+                    date: r.date_text,
+                    imageUrl: r.image_url
+                }));
+                setReleases(mappedReleases);
+            }
 
             // Buscando Foto do Autor
-            try {
-                const { data: settingsData } = await supabase
-                    .from('site_settings')
-                    .select('*')
-                    .eq('key', 'author_photo')
-                    .single();
+            const { data: settingsData } = await supabase
+                .from('site_settings')
+                .select('*')
+                .eq('key', 'author_photo')
+                .maybeSingle();
 
-                if (settingsData && settingsData.value) {
-                    setAuthorPhoto(settingsData.value);
-                }
-            } catch (e) {
-                // Configuração opcional, não trava o app
+            if (settingsData && settingsData.value) {
+                setAuthorPhoto(settingsData.value);
             }
 
         } catch (err: any) {
-            console.error("Erro Crítico Supabase:", err);
-            setError(`Falha na conexão: ${err.message || "Tente recarregar a página."}`);
+            console.error("Falha na inicialização:", err);
+            setError(err.message || "Falha desconhecida na biblioteca arcana.");
         } finally {
             setLoading(false);
             setIsInitialized(true);
         }
-    }, []);
+    }, [isInitialized, books.length]);
     
     useEffect(() => {
         initializeData();
@@ -175,7 +171,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         firstChapter: string
     ) => {
         setLoading(true);
-        setError(null);
         try {
             const id = Date.now().toString();
             const finalCoverUrl = coverBase64 || `https://picsum.photos/seed/${id}/800/1200`;
@@ -212,7 +207,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             setBooks(prev => [newBook, ...prev]);
         } catch (err: any) {
-            setError(`Erro ao salvar: ${err.message}`);
+            alert(`Erro ao salvar: ${err.message}`);
             throw err;
         } finally {
             setLoading(false);
@@ -242,7 +237,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
             setBooks(prev => prev.map(book => book.id === bookId ? { ...book, ...updates } : book));
         } catch (err: any) {
-            console.error("Erro ao atualizar livro:", err);
             alert(`Erro ao atualizar: ${err.message}`);
         } finally {
             setLoading(false);
@@ -257,7 +251,7 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 .eq('id', bookId);
 
             if (error) {
-                console.error("Erro ao atualizar capa no DB:", error);
+                alert("Erro ao atualizar capa: " + error.message);
                 return;
             }
         }
@@ -270,12 +264,9 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const id = Date.now().toString();
         if (supabase) {
             const { error } = await supabase.from('banners').insert([{
-                id,
-                image_url: imageUrl,
-                link_url: linkUrl,
-                position
+                id, image_url: imageUrl, link_url: linkUrl, position
             }]);
-            if (error) return;
+            if (error) { alert(error.message); return; }
         }
         const newBanner: Banner = { id, imageUrl, linkUrl, position, createdAt: new Date().toISOString() };
         setBanners(prev => [...prev, newBanner]);
@@ -289,9 +280,10 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const addRelease = async (title: string, description: string, date: string, imageUrl: string) => {
         const id = Date.now().toString();
         if (supabase) {
-            await supabase.from('releases').insert([{
+            const { error } = await supabase.from('releases').insert([{
                 id, title, description, date_text: date, image_url: imageUrl
             }]);
+            if (error) { alert(error.message); return; }
         }
         setReleases(prev => [{ id, title, description, date, imageUrl }, ...prev]);
     };
