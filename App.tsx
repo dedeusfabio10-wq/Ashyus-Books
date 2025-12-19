@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { BookProvider } from './context/BookContext';
 import Header from './components/Header';
@@ -16,6 +17,7 @@ import SEOManager from './components/SEOManager';
 import { playPageTurnSound } from './utils/audio';
 
 export type Page = 'home' | 'books' | 'about' | 'blog';
+export type HolidayTheme = 'christmas' | 'newyear' | 'normal';
 
 const pageTitles = {
     home: 'Crônicas da Fantasia | Ashyus Books - Dark Fantasy e Romance',
@@ -28,70 +30,74 @@ const pageDescriptions = {
     home: "Portal oficial do autor Ashyus. Explore best-sellers de Dark Fantasy, Romance Sombrio e Mistério. Entre no reino onde a luz e a sombra colidem.",
     books: "Leia sinopses completas, primeiros capítulos gratuitos e compre os livros da saga Crônicas da Fantasia. Disponível na Amazon e Kindle Unlimited.",
     about: "Conheça a história de Ashyus, o autor brasileiro que está redefinindo a fantasia sombria com narrativas profundas e personagens inesquecíveis.",
-    blog: "Fique atualizado com as últimas notícias, datas de lançamento de livros, eventos de autógrafos e contos exclusivos do blog de Ashyus.",
+    blog: "Fique atualizado com as últimas notícias, das de lançamento de livros, eventos de autógrafos e contos exclusivos do blog de Ashyus.",
 }
 
 const App: React.FC = () => {
-    // Inicializa a página baseada na URL atual (suporte para Sitemap)
-    const getInitialPage = (): Page => {
+    // Lógica Sazonal Atualizada
+    const getHolidayTheme = (): HolidayTheme => {
+        const now = new Date();
+        const month = now.getMonth() + 1; // 0-indexed
+        const day = now.getDate();
+
+        // Natal: Agora ativado de 01 a 30 de Dezembro
+        if (month === 12 && day >= 1 && day <= 30) {
+            return 'christmas';
+        }
+        // Ano Novo: 31 de Dezembro a 1 de Janeiro
+        if ((month === 12 && day === 31) || (month === 1 && day === 1)) {
+            return 'newyear';
+        }
+        return 'normal';
+    };
+
+    const [currentPage, setCurrentPage] = useState<Page>(() => {
         const path = window.location.pathname.replace('/', '');
         if (path === 'books') return 'books';
         if (path === 'about') return 'about';
         if (path === 'blog') return 'blog';
         return 'home';
-    };
+    });
 
-    const [currentPage, setCurrentPage] = useState<Page>(getInitialPage());
+    const [holidayTheme, setHolidayTheme] = useState<HolidayTheme>(getHolidayTheme());
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
     const [showIntro, setShowIntro] = useState(true);
     const hasInteracted = useRef(false);
 
+    // Efeito para atualizar o tema se o usuário deixar a página aberta na virada
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const newTheme = getHolidayTheme();
+            if (newTheme !== holidayTheme) setHolidayTheme(newTheme);
+        }, 1000 * 60 * 60); // Verifica a cada hora
+        return () => clearInterval(interval);
+    }, [holidayTheme]);
+
     const openAdminModal = useCallback(() => setIsAdminModalOpen(true), []);
     const closeAdminModal = useCallback(() => setIsAdminModalOpen(false), []);
     
-    // Função para mudar página que atualiza também a URL (SEO Friendly)
     const handlePageChange = (page: Page) => {
         setCurrentPage(page);
-        
-        // Atualiza URL sem recarregar
         const path = page === 'home' ? '/' : `/${page}`;
         window.history.pushState({ page }, '', path);
-        
-        // Scroll para o topo para garantir que o Google veja o início do conteúdo
         window.scrollTo(0, 0);
     };
 
-    // Listener para o botão "Voltar" do navegador
     useEffect(() => {
         const handlePopState = () => {
-            setCurrentPage(getInitialPage());
+            const path = window.location.pathname.replace('/', '');
+            setCurrentPage(path as Page || 'home');
         };
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    // Efeito para trocar o Título e Meta Description (SEO Dinâmico)
     useEffect(() => {
-        // Título Otimizado
         document.title = pageTitles[currentPage] || 'Crônicas da Fantasia';
-        
-        // Meta Description Otimizada
         const metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) {
-            metaDesc.setAttribute('content', pageDescriptions[currentPage] || pageDescriptions.home);
-        }
-
-        // Canonical URL
-        const canonical = document.querySelector('link[rel="canonical"]');
-        if (canonical) {
-            const baseUrl = window.location.origin;
-            const path = currentPage === 'home' ? '' : `/${currentPage}`;
-            canonical.setAttribute('href', `${baseUrl}${path}`);
-        }
-
+        if (metaDesc) metaDesc.setAttribute('content', pageDescriptions[currentPage] || pageDescriptions.home);
     }, [currentPage]);
 
-    // Efeito para tocar som na troca de página
     useEffect(() => {
         if (hasInteracted.current) {
             playPageTurnSound();
@@ -105,61 +111,42 @@ const App: React.FC = () => {
 
     const renderPage = () => {
         switch (currentPage) {
-            case 'home':
-                return <HomePage />;
-            case 'books':
-                return <BooksPage />;
-            case 'about':
-                return <AboutPage />;
-            case 'blog':
-                return <BlogPage />;
-            default:
-                return <HomePage />;
+            case 'home': return <HomePage />;
+            case 'books': return <BooksPage />;
+            case 'about': return <AboutPage />;
+            case 'blog': return <BlogPage />;
+            default: return <HomePage />;
         }
     };
 
     return (
         <BookProvider>
-            {/* Gerenciador de SEO Invisível */}
             <SEOManager currentPage={currentPage} />
 
             {showIntro && <IntroOverlay onComplete={handleIntroComplete} />}
             
-            <div className={`flex flex-col min-h-screen bg-transparent transition-opacity duration-1000 ${showIntro ? 'opacity-0' : 'opacity-100'} relative`}>
+            <div className={`flex flex-col min-h-screen bg-transparent transition-opacity duration-1000 ${showIntro ? 'opacity-0' : 'opacity-100'} relative theme-${holidayTheme}`}>
                 
-                {/* Eventos Atmosféricos (Ficam abaixo do conteúdo mas acima do background) */}
-                <AtmosphericEvents />
+                <AtmosphericEvents holidayTheme={holidayTheme} />
 
                 <Header 
                     currentPage={currentPage} 
                     setCurrentPage={handlePageChange} 
                     onAdminClick={openAdminModal}
+                    holidayTheme={holidayTheme}
                 />
                 
-                {/* Container Principal com Layout Flex para Sidebars */}
                 <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 flex gap-8 relative justify-center z-10">
-                    
-                    {/* Lateral Esquerda (Só aparece em telas grandes) */}
                     <AdSidebar side="left" />
-
-                    {/* Conteúdo Principal */}
                     <main className="flex-1 max-w-full min-w-0 mb-32 xl:mb-0">
                         {renderPage()}
                     </main>
-
-                    {/* Lateral Direita (Só aparece em telas grandes) */}
                     <AdSidebar side="right" />
-                    
                 </div>
 
-                <Footer />
-                
-                {/* Banner Mobile (Aparece apenas em telas menores que XL) */}
+                <Footer holidayTheme={holidayTheme} />
                 <MobileAdBanner />
-
-                {/* Autômato de Vendas (Robozinho) */}
-                <SalesCompanion />
-
+                <SalesCompanion holidayTheme={holidayTheme} />
                 {isAdminModalOpen && <AdminModal onClose={closeAdminModal} />}
             </div>
         </BookProvider>

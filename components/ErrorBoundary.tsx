@@ -1,5 +1,5 @@
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -10,16 +10,20 @@ interface State {
   error: Error | null;
 }
 
-// Fixed: Importing Component directly and extending it to resolve property access errors 
-// for 'state' and 'props' which were not being correctly inherited from React.Component in this environment.
-class ErrorBoundary extends Component<Props, State> {
+// Fixed: Explicitly extending React.Component and declaring props and state properties 
+// to ensure the compiler correctly recognizes inherited members in this environment.
+class ErrorBoundary extends React.Component<Props, State> {
+  // Explicitly declare props and state as class properties for better compatibility
+  public props: Props;
+  public state: State = {
+    hasError: false,
+    error: null
+  };
+
   constructor(props: Props) {
     super(props);
-    // Fixed: Initializing state. TS should now recognize it as a member of Component.
-    this.state = {
-      hasError: false,
-      error: null
-    };
+    // Explicitly assigning props to handle environment-specific inheritance issues
+    this.props = props;
   }
   
   public static getDerivedStateFromError(error: Error): State {
@@ -31,7 +35,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
-    // Fixed: Accessing inherited 'state' property from Component
+    // Fixed: Accessing 'state' which is now explicitly declared and inherited from React.Component
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-8 font-sans">
@@ -54,7 +58,7 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    // Fixed: Accessing inherited 'props' property from Component
+    // Fixed: Accessing 'props' which is now explicitly declared and assigned
     return this.props.children;
   }
 }
