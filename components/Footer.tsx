@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import Logo from './Logo';
-import { HolidayTheme } from '../App';
+import { HolidayTheme, Page } from '../App';
 
 interface FooterProps {
     holidayTheme?: HolidayTheme;
+    setCurrentPage?: (page: Page) => void;
 }
 
 const SocialIcon: React.FC<{ href: string; path: string; label: string }> = ({ href, path, label }) => (
@@ -21,24 +22,26 @@ const SocialIcon: React.FC<{ href: string; path: string; label: string }> = ({ h
     </a>
 );
 
-const Footer: React.FC<FooterProps> = ({ holidayTheme = 'normal' }) => {
+const Footer: React.FC<FooterProps> = ({ holidayTheme = 'normal', setCurrentPage }) => {
     const [email, setEmail] = useState('');
     const [subscribed, setSubscribed] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
         if (!email) return;
         setLoading(true);
-        // Fallback simulação para o exemplo
         setTimeout(() => {
             setSubscribed(true);
             setEmail('');
             setLoading(false);
             setTimeout(() => setSubscribed(false), 5000);
         }, 1000);
+    };
+
+    const navigateTo = (page: Page) => (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (setCurrentPage) setCurrentPage(page);
     };
 
     return (
@@ -93,15 +96,14 @@ const Footer: React.FC<FooterProps> = ({ holidayTheme = 'normal' }) => {
                                 </button>
                             </form>
                         )}
-                        <p className="text-xs text-gray-600 mt-3">{holidayTheme === 'christmas' ? 'Presentes mágicos no seu e-mail.' : 'Novas histórias este ano.'}</p>
                     </div>
                 </div>
 
                 <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600">
-                    <p>&copy; {new Date().getFullYear()} Ashyus Books. {holidayTheme === 'christmas' ? 'Feliz Natal!' : holidayTheme === 'newyear' ? 'Feliz Ano Novo!' : ''}</p>
+                    <p>&copy; {new Date().getFullYear()} Ashyus Books.</p>
                     <div className="flex gap-4 mt-4 md:mt-0">
-                        <a href="#" className="hover:text-gray-400 transition-colors">Política de Privacidade</a>
-                        <a href="#" className="hover:text-gray-400 transition-colors">Termos de Uso</a>
+                        <a href="/privacy" onClick={navigateTo('privacy')} className="hover:text-gray-400 transition-colors">Política de Privacidade</a>
+                        <a href="/terms" onClick={navigateTo('terms')} className="hover:text-gray-400 transition-colors">Termos de Uso</a>
                     </div>
                 </div>
             </div>

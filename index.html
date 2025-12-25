@@ -3,38 +3,31 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <!-- Força o navegador a fazer upgrade de qualquer requisição HTTP para HTTPS automaticamente -->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     
-    <!-- Favicon gerado via SVG Data URI -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230f172a' stroke='%23fbbf24' stroke-width='2'/%3E%3Cpath d='M20 75C20 75 35 82 50 78C65 82 80 75 80 75V45C80 45 65 52 50 48C35 52 20 45 20 45V75Z' fill='%231e293b' stroke='%23fbbf24' stroke-width='3'/%3E%3Cpath d='M50 50C50 50 60 35 50 15C40 35 50 50 50 50Z' fill='%23fbbf24'/%3E%3C/svg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- SEO Primário - URLs agora são HTTPS -->
+    <!-- SEO Primário -->
     <title>Crônicas da Fantasia | Ashyus Books - Dark Fantasy e Romance</title>
-    <meta name="description" content="Portal oficial do autor Ashyus. Descubra livros de Dark Fantasy, Romance Sombrio e Mistério. Leia capítulos gratuitos, veja lançamentos e mergulhe nas Crônicas da Fantasia." />
+    <meta name="description" content="Portal oficial do autor Ashyus. Descubra livros de Dark Fantasy, Romance Sombrio e Mistério. Leia capítulos gratuitos e mergulhe nas Crônicas da Fantasia." />
     <meta name="keywords" content="Ashyus Books, Dark Fantasy, Romance, Livros de Fantasia, Autor Brasileiro, Literatura Fantástica, Mistério" />
     <meta name="author" content="Ashyus" />
-    <link rel="canonical" href="https://www.cronicasdafantasia.com.br" />
+    <link rel="canonical" href="https://cronicasdafantasia.com.br" />
     
-    <!-- Open Graph / Facebook / WhatsApp - URLs HTTPS -->
+    <!-- Google AdSense - INSIRA SEU CÓDIGO ABAIXO QUANDO DISPONÍVEL -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.cronicasdafantasia.com.br" />
+    <meta property="og:url" content="https://cronicasdafantasia.com.br" />
     <meta property="og:title" content="Crônicas da Fantasia | O Universo de Ashyus" />
-    <meta property="og:description" content="Histórias onde a luz e a sombra colidem. Conheça os livros, leia contos exclusivos e acompanhe os lançamentos de Ashyus Books." />
+    <meta property="og:description" content="Histórias onde a luz e a sombra colidem. Conheça os livros e acompanhe os lançamentos de Ashyus Books." />
     <meta property="og:image" content="https://picsum.photos/seed/ashyus_social/1200/630" />
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:creator" content="@ashyusdark" />
-    <meta name="twitter:title" content="Crônicas da Fantasia | Ashyus Books" />
-    <meta name="twitter:description" content="Portal oficial de Dark Fantasy. Mergulhe em histórias de luz e sombra." />
-    <meta name="twitter:image" content="https://picsum.photos/seed/ashyus_social/1200/630" />
-
-    <!-- Performance Optimization: Preconnect & Preload -->
+    <!-- Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://vjylpdxmxmzzrxhzxrxt.supabase.co" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -50,120 +43,44 @@
               'brand-dark': '#0f172a',
               'brand-darker': '#1e293b',
               'brand-light': '#e2e8f0',
-              'brand-lighter': '#f8fafc',
               'brand-gold': '#fbbf24',
               'brand-gold-dark': '#d97706',
               'xmas-red': '#991b1b',
-              'xmas-green': '#166534',
               'ny-gold': '#fcd34d',
             },
             animation: {
                 'fade-in': 'fadeIn 0.6s ease-out',
                 'slide-up': 'slideUp 0.6s ease-out',
-                'fog-flow': 'fogFlow 20s linear infinite',
-                'fly-diagonal': 'flyDiagonal 15s linear forwards',
-                'fly-straight': 'flyStraight 20s linear forwards',
-                'peek-up': 'peekUp 4s ease-in-out forwards',
-                'arrow-shot': 'arrowShot 1.5s linear forwards',
-                'float-random': 'floatRandom 10s ease-in-out infinite',
+                'snow-fall': 'snowFall 10s linear infinite',
+                'sparkle-up': 'sparkleUp 4s ease-out infinite',
                 'float-slow': 'floatSlow 6s ease-in-out infinite',
-                'breathe': 'breathe 8s ease-in-out infinite',
                 'spin-slow': 'spin 20s linear infinite',
                 'infinite-scroll-up': 'scrollUp 40s linear infinite',
                 'infinite-scroll-down': 'scrollDown 40s linear infinite',
                 'infinite-scroll-left': 'scrollLeft 30s linear infinite',
-                'dragon-flap': 'dragonFlap 0.5s ease-in-out infinite alternate',
-                'claw-strike': 'clawStrike 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-                'screen-shake': 'screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-                'fire-stream': 'fireStream 0.5s linear infinite',
-                'fire-pulse': 'firePulse 0.2s ease-in-out infinite alternate',
-                'fly-path': 'flyPath 4s ease-out forwards',
-                'snow-fall': 'snowFall 10s linear infinite',
-                'sparkle-up': 'sparkleUp 4s ease-out infinite',
             },
             keyframes: {
                 fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
                 slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                fogFlow: { '0%': { transform: 'translateX(-10%)' }, '50%': { transform: 'translateX(10%)' }, '100%': { transform: 'translateX(-10%)' } },
-                flyDiagonal: { '0%': { transform: 'translate(-10vw, 10vh) scale(0.8)', opacity: '0' }, '10%': { opacity: '0.4' }, '90%': { opacity: '0.4' }, '100%': { transform: 'translate(110vw, -20vh) scale(0.8)', opacity: '0' } },
-                flyStraight: { '0%': { transform: 'translate(-20vw, 0) rotate(5deg)', opacity: '0' }, '10%': { opacity: '0.3' }, '90%': { opacity: '0.3' }, '100%': { transform: 'translate(120vw, 10vh) rotate(5deg)', opacity: '0' } },
-                peekUp: { '0%': { transform: 'translateY(100%)', opacity: '1' }, '20%': { transform: 'translateY(10%)', opacity: '1' }, '60%': { transform: 'translateY(10%)', opacity: '1' }, '100%': { transform: 'translateY(100%)', opacity: '1' } },
-                arrowShot: { '0%': { transform: 'translateX(-10vw) rotate(-5deg)', opacity: '0' }, '5%': { opacity: '1' }, '95%': { opacity: '1' }, '100%': { transform: 'translateX(110vw) rotate(-5deg)', opacity: '0' } },
-                floatRandom: { '0%, 100%': { transform: 'translate(0, 0)' }, '25%': { transform: 'translate(10px, -15px)' }, '50%': { transform: 'translate(-5px, 10px)' }, '75%': { transform: 'translate(-10px, -5px)' } },
                 floatSlow: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } },
-                breathe: { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.05)' } },
-                spin: { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } },
                 scrollUp: { '0%': { transform: 'translateY(0)' }, '100%': { transform: 'translateY(-50%)' } },
                 scrollDown: { '0%': { transform: 'translateY(-50%)' }, '100%': { transform: 'translateY(0)' } },
                 scrollLeft: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
-                dragonFlap: {
-                    '0%': { transform: 'rotateX(0deg) skewX(0deg)' },
-                    '100%': { transform: 'rotateX(60deg) skewX(-10deg)' }
-                },
-                flyPath: {
-                    '0%': { top: '5vh', left: '100vw', transform: 'scale(0.8) rotate(10deg)' },
-                    '50%': { top: '15vh', left: '50vw', transform: 'scale(1.2) rotate(-5deg)' },
-                    '100%': { top: '10px', left: '20px', transform: 'scale(1) rotate(0deg)' }
-                },
-                clawStrike: {
-                    '0%': { transform: 'translate(-50%, -50%) scale(1)', opacity: '1' },
-                    '50%': { transform: 'translate(-50%, -50%) scale(10)' },
-                    '100%': { transform: 'translate(-50%, -50%) scale(30)', opacity: '0' }
-                },
-                screenShake: {
-                    '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                    '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                    '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                    '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-                },
-                fireStream: {
-                    '0%': { strokeDasharray: '0, 100', strokeDashoffset: '0' },
-                    '100%': { strokeDasharray: '100, 0', strokeDashoffset: '-100' }
-                },
-                firePulse: {
-                    '0%': { opacity: '0.8', filter: 'blur(2px)' },
-                    '100%': { opacity: '1', filter: 'blur(4px)' }
-                },
                 snowFall: {
                     '0%': { transform: 'translateY(-10vh) translateX(0)', opacity: '0' },
                     '10%': { opacity: '1' },
-                    '90%': { opacity: '1' },
                     '100%': { transform: 'translateY(110vh) translateX(20px)', opacity: '0' }
                 },
                 sparkleUp: {
                     '0%': { transform: 'translateY(100vh) scale(0)', opacity: '0' },
-                    '50%': { opacity: '1', transform: 'translateY(50vh) scale(1.5)' },
                     '100%': { transform: 'translateY(0) scale(0)', opacity: '0' }
                 }
-            },
-            backgroundImage: {
-                'hero-pattern': "radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 60%, #020617 100%)",
             }
           },
         },
       }
     </script>
-    <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.3.1",
-    "react/": "https://esm.sh/react@18.3.1/",
-    "react-dom": "https://esm.sh/react-dom@18.3.1",
-    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
-    "@google/genai": "https://esm.sh/@google/genai",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
-    "vite": "https://esm.sh/vite@^7.2.7"
-  }
-}
-</script>
     <style>
-        /* Otimização de Performance: Hardware Acceleration */
-        .fog-container, .animate-fly-path, .animate-float-slow, .animate-infinite-scroll-up, .animate-infinite-scroll-down {
-            will-change: transform;
-            transform: translateZ(0); /* Força uso da GPU */
-        }
-
         body::before {
             content: "";
             position: fixed;
@@ -171,17 +88,24 @@
             opacity: 0.03; pointer-events: none; z-index: -1;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
         }
-        .fog-container { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 1; pointer-events: none; }
-        .fog-img { position: absolute; height: 100vh; width: 300vw; z-index: 1; opacity: 0.5; background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog1.png') repeat-x; background-size: contain; animation: fog 60s linear infinite; }
-        .fog-img-2 { position: absolute; height: 100vh; width: 300vw; z-index: 2; opacity: 0.3; background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/img/fog2.png') repeat-x; background-size: contain; animation: fog 40s linear infinite reverse; }
-        @keyframes fog { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-200vw, 0, 0); } }
-
-        /* Estilos Sazonais Extras */
         .theme-christmas { --seasonal-accent: #ef4444; }
         .theme-newyear { --seasonal-accent: #fcd34d; }
     </style>
-  </head>
-  <body class="bg-hero-pattern min-h-screen font-sans text-brand-light antialiased selection:bg-brand-gold selection:text-brand-dark overflow-x-hidden">
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.89.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite": "https://esm.sh/vite@^7.3.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-[#0f172a] min-h-screen font-sans text-brand-light antialiased selection:bg-brand-gold selection:text-brand-dark overflow-x-hidden">
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
   </body>
