@@ -9,6 +9,50 @@ interface IntroOverlayProps {
 
 type IntroStage = 'initial' | 'wizard' | 'exiting';
 
+const WizardFigure = () => (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-40 md:opacity-50">
+        <svg viewBox="0 0 200 200" className="w-[80%] h-[80%] max-w-[500px] animate-float-slow">
+            <defs>
+                <radialGradient id="wizardEyes" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#fbbf24" />
+                    <stop offset="100%" stopColor="#d97706" />
+                </radialGradient>
+            </defs>
+            {/* Capuz/Silhueta */}
+            <path 
+                d="M100 30 C60 30 40 70 45 110 L30 180 L170 180 L155 110 C160 70 140 30 100 30Z" 
+                fill="#020617" 
+                stroke="#fbbf24" 
+                strokeWidth="0.5"
+                className="drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+            />
+            {/* Sombra interna do capuz */}
+            <path 
+                d="M60 85 Q100 65 140 85 Q140 120 100 130 Q60 120 60 85" 
+                fill="#000" 
+            />
+            {/* Olhos Brilhantes */}
+            <g className="animate-pulse">
+                <circle cx="85" cy="95" r="2" fill="url(#wizardEyes)">
+                    <animate attributeName="r" values="1.5;2.5;1.5" dur="3s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="115" cy="95" r="2" fill="url(#wizardEyes)">
+                    <animate attributeName="r" values="1.5;2.5;1.5" dur="3s" repeatCount="indefinite" />
+                </circle>
+            </g>
+            {/* Detalhes de fumaça/magia */}
+            <path 
+                d="M50 180 Q30 140 50 100 M150 180 Q170 140 150 100" 
+                stroke="#fbbf24" 
+                strokeWidth="0.2" 
+                fill="none" 
+                strokeDasharray="4 4"
+                opacity="0.3"
+            />
+        </svg>
+    </div>
+);
+
 const IntroOverlay: React.FC<IntroOverlayProps> = ({ onComplete }) => {
     const [stage, setStage] = useState<IntroStage>('initial');
     const [isVisible, setIsVisible] = useState(true);
@@ -89,23 +133,29 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onComplete }) => {
             )}
 
             {stage === 'wizard' && (
-                <div className="relative z-30 flex flex-col items-center justify-center h-full w-full pb-10 md:pb-0 text-center">
-                    <h2 className="font-serif text-3xl md:text-5xl text-white font-bold drop-shadow-[0_0_10px_rgba(0,0,0,1)] mb-8 tracking-wide animate-fade-in">
-                        "Você tem certeza que quer entrar?"
-                    </h2>
-                    <div className="flex justify-center gap-8 md:gap-16">
-                        <button 
-                            onClick={handleConfirmYes}
-                            className="bg-brand-gold text-brand-dark font-bold font-serif text-xl px-8 py-3 rounded shadow-[0_0_20px_rgba(251,191,36,0.5)] hover:bg-white hover:scale-110 transition-all duration-300"
-                        >
-                            SIM
-                        </button>
-                        <button 
-                            onClick={handleRefuseNo}
-                            className="bg-transparent border border-red-900 text-red-500 font-bold font-serif text-xl px-8 py-3 rounded hover:bg-red-900/20 hover:text-red-400 hover:scale-95 transition-all duration-300"
-                        >
-                            NÃO
-                        </button>
+                <div className="relative z-30 flex flex-col items-center justify-center h-full w-full pb-10 md:pb-0 text-center px-6">
+                    <WizardFigure />
+                    <div className="relative z-10 space-y-8 animate-fade-in">
+                        <h2 className="font-serif text-3xl md:text-6xl text-white font-bold drop-shadow-[0_2px_15px_rgba(0,0,0,1)] tracking-wide">
+                            "Você tem certeza que quer entrar?"
+                        </h2>
+                        <p className="text-brand-gold/70 italic text-sm md:text-lg max-w-md mx-auto">
+                            O guardião das crônicas observa sua alma através das sombras...
+                        </p>
+                        <div className="flex justify-center gap-8 md:gap-16 pt-4">
+                            <button 
+                                onClick={handleConfirmYes}
+                                className="bg-brand-gold text-brand-dark font-bold font-serif text-xl px-10 py-4 rounded-sm shadow-[0_0_30px_rgba(251,191,36,0.4)] hover:bg-white hover:scale-110 transition-all duration-300 uppercase tracking-widest"
+                            >
+                                SIM
+                            </button>
+                            <button 
+                                onClick={handleRefuseNo}
+                                className="bg-transparent border border-red-900 text-red-500 font-bold font-serif text-xl px-10 py-4 rounded-sm hover:bg-red-900/20 hover:text-red-400 hover:scale-95 transition-all duration-300 uppercase tracking-widest"
+                            >
+                                NÃO
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
