@@ -10,34 +10,27 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0f172a" />
     
-    <!-- Apple PWA Tags -->
+    <!-- Meta-tags de Autoridade -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Ashyus Books" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230f172a' stroke='%23fbbf24' stroke-width='2'/%3E%3Cpath d='M20 75C20 75 35 82 50 78C65 82 80 75 80 75V45C80 45 65 52 50 48C35 52 20 45 20 45V75Z' fill='%23fbbf24'/%3E%3C/svg%3E" />
 
-    <!-- SEO Primário -->
-    <title>Crônicas da Fantasia | Ashyus Books - Dark Fantasy e Romance</title>
-    <meta name="description" content="Portal oficial do autor Ashyus. Descubra livros de Dark Fantasy, Romance Sombrio e Mistério. Leia capítulos gratuitos e mergulhe nas Crônicas da Fantasia." />
-    <meta name="keywords" content="Ashyus Books, Dark Fantasy, Romance, Livros de Fantasia, Autor Brasileiro, Literatura Fantástica, Mistério, Crônicas da Fantasia" />
+    <!-- SEO Avançado -->
+    <title>Ashyus Books | Crônicas da Fantasia - Dark Fantasy e Romance</title>
+    <meta name="description" content="Portal oficial de Ashyus Books. Explore mundos de Dark Fantasy, Romance Sombrio e Mistério. Leia capítulos exclusivos das Crônicas da Fantasia e acompanhe lançamentos." />
+    <meta name="keywords" content="Ashyus Books, Dark Fantasy Brasil, Romance Sombrio, Fantasia Brasileira, Autor Ashyus, Crônicas da Fantasia, Kindle Unlimited Brasil, Livros de Magia" />
     <meta name="author" content="Ashyus" />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://cronicasdafantasia.com.br" />
     
-    <!-- Google AdSense - Verificação de Conta e Script -->
+    <!-- Verificação AdSense -->
     <meta name="google-adsense-account" content="ca-pub-1696989351932453">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1696989351932453" crossorigin="anonymous"></script>
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://cronicasdafantasia.com.br" />
-    <meta property="og:title" content="Crônicas da Fantasia | O Universo de Ashyus" />
-    <meta property="og:description" content="Histórias onde a luz e a sombra colidem. Conheça os livros e acompanhe os lançamentos de Ashyus Books." />
-    <meta property="og:image" content="https://picsum.photos/seed/ashyus_social/1200/630" />
-
-    <!-- Performance -->
+    <!-- Pre-connect para Fontes (Performance) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -50,117 +43,59 @@
             },
             colors: {
               'brand-dark': '#0f172a',
-              'brand-darker': '#1e293b',
-              'brand-light': '#e2e8f0',
               'brand-gold': '#fbbf24',
-              'brand-gold-dark': '#d97706',
-              'xmas-red': '#991b1b',
-              'ny-gold': '#fcd34d',
-            },
-            animation: {
-                'fade-in': 'fadeIn 0.6s ease-out',
-                'slide-up': 'slideUp 0.6s ease-out',
-                'snow-fall': 'snowFall 10s linear infinite',
-                'sparkle-up': 'sparkleUp 4s ease-out infinite',
-                'float-slow': 'floatSlow 6s ease-in-out infinite',
-                'spin-slow': 'spin 20s linear infinite',
-                'infinite-scroll-up': 'scrollUp 40s linear infinite',
-                'infinite-scroll-down': 'scrollDown 40s linear infinite',
-                'infinite-scroll-left': 'scrollLeft 30s linear infinite',
-                'screen-shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-                'fly-path': 'flyPath 4s linear forwards',
-                'claw-strike': 'clawStrike 1s ease-in-out forwards',
-                'dragon-flap': 'dragonFlap 0.4s ease-in-out infinite',
-                'fire-pulse': 'firePulse 0.5s ease-in-out infinite',
-                'fly-diagonal': 'flyDiagonal 8s linear infinite',
-                'arrow-shot': 'arrowShot 2s ease-in forwards',
-                'float-random': 'floatRandom 10s ease-in-out infinite',
-                'breathe': 'breathe 4s ease-in-out infinite'
-            },
-            keyframes: {
-                fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-                floatSlow: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } },
-                scrollUp: { '0%': { transform: 'translateY(0)' }, '100%': { transform: 'translateY(-50%)' } },
-                scrollDown: { '0%': { transform: 'translateY(-50%)' }, '100%': { transform: 'translateY(0)' } },
-                scrollDown: { '0%': { transform: 'translateY(-50%)' }, '100%': { transform: 'translateY(0)' } },
-                scrollLeft: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
-                shake: { '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' }, '20%, 80%': { transform: 'translate3d(2px, 0, 0)' }, '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' }, '40%, 60%': { transform: 'translate3d(4px, 0, 0)' } },
-                flyPath: { '0%': { transform: 'translateX(-100vw) translateY(50vh) scale(0.5) rotate(20deg)' }, '50%': { transform: 'translateX(50vw) translateY(10vh) scale(1.2) rotate(-10deg)' }, '100%': { transform: 'translateX(20px) translateY(20px) scale(1) rotate(0deg)' } },
-                clawStrike: { '0%': { transform: 'translate(-50%, -50%) scale(0) rotate(-45deg)', opacity: '0' }, '50%': { transform: 'translate(-50%, -50%) scale(2) rotate(0deg)', opacity: '1' }, '100%': { transform: 'translate(-50%, -50%) scale(3) rotate(15deg)', opacity: '0' } },
-                dragonFlap: { '0%, 100%': { transform: 'rotateX(0deg)' }, '50%': { transform: 'rotateX(40deg)' } },
-                firePulse: { '0%, 100%': { opacity: '0.6', transform: 'scale(1)' }, '50%': { opacity: '1', transform: 'scale(1.1)' } },
-                flyDiagonal: { '0%': { transform: 'translateX(-100px) translateY(100px)', opacity: '0' }, '10%': { opacity: '1' }, '90%': { opacity: '1' }, '100%': { transform: 'translateX(120vw) translateY(-100px)', opacity: '0' } },
-                arrowShot: { '0%': { transform: 'translateX(-200px)', opacity: '0' }, '10%': { opacity: '1' }, '100%': { transform: 'translateX(120vw)', opacity: '0.8' } },
-                floatRandom: { '0%, 100%': { transform: 'translate(0, 0)', opacity: '0' }, '20%': { opacity: '1' }, '50%': { transform: 'translate(100px, -100px)', opacity: '0.8' }, '80%': { opacity: '1' } },
-                breathe: { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.05)' } },
-                snowFall: {
-                    '0%': { transform: 'translateY(-10vh) translateX(0)', opacity: '0' },
-                    '10%': { opacity: '1' },
-                    '100%': { transform: 'translateY(110vh) translateX(20px)', opacity: '0' }
-                },
-                sparkleUp: {
-                    '0%': { transform: 'translateY(100vh) scale(0)', opacity: '0' },
-                    '100%': { transform: 'translateY(0) scale(0)', opacity: '0' }
-                }
             }
           },
         },
       }
     </script>
     <style>
+        .seo-fallback { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
         body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0.03; pointer-events: none; z-10: -1;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
-        }
-        .theme-christmas { --seasonal-accent: #ef4444; }
-        .theme-newyear { --seasonal-accent: #fcd34d; }
-        
-        /* Ocultar conteúdo SEO do usuário mas manter para o robô */
-        .seo-fallback {
-            position: absolute;
-            left: -9999px;
-            top: auto;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.03; pointer-events: none; z-index: -1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
     </style>
-  <script type="importmap">
+    <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^18.3.1/",
-    "react": "https://esm.sh/react@^18.3.1",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react-dom/": "https://esm.sh/react-dom@^18.3.1/",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.45.0",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^4.3.1",
-    "vite": "https://esm.sh/vite@^5.4.1"
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "@google/genai": "https://esm.sh/@google/genai@1.34.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.0",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
-</head>
-  <body class="bg-[#0f172a] min-h-screen font-sans text-brand-light antialiased selection:bg-brand-gold selection:text-brand-dark overflow-x-hidden">
+  </head>
+  <body class="bg-[#0f172a] text-slate-200 antialiased selection:bg-brand-gold selection:text-brand-dark">
     <div id="root">
-        <!-- Conteúdo Estático para AdSense (Crawler) -->
-        <div class="seo-fallback">
-            <h1>Crônicas da Fantasia - Ashyus Books</h1>
-            <p>Bem-vindo ao portal oficial do autor Ashyus. Especialista em literatura Dark Fantasy, Romance e Mistério.</p>
-            <h2>Nossos Livros e Publicações</h2>
-            <p>Explore mundos sombrios, magia proibida e romances épicos. Nossas obras estão disponíveis na Amazon e Kindle Unlimited.</p>
-            <p>Ashyus é um autor brasileiro que cria narrativas profundas e universos fantásticos únicos para jovens adultos.</p>
+        <!-- SEO Fallback: Vital para AdSense Crawler -->
+        <header class="seo-fallback">
+            <h1>Ashyus Books - Crônicas da Fantasia</h1>
+            <p>Literatura Brasileira de Dark Fantasy, Romance e Mistério.</p>
             <nav>
-                <a href="/">Home</a>
-                <a href="/books">Biblioteca</a>
-                <a href="/about">Sobre o Autor</a>
-                <a href="/blog">Novidades Literárias</a>
-                <a href="/privacy">Política de Privacidade</a>
-                <a href="/terms">Termos de Uso</a>
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/books">Biblioteca de Livros</a></li>
+                    <li><a href="/about">Sobre o Autor</a></li>
+                    <li><a href="/blog">Blog e Lançamentos</a></li>
+                    <li><a href="/privacy">Privacidade</a></li>
+                    <li><a href="/terms">Termos</a></li>
+                </ul>
             </nav>
-        </div>
+        </header>
+        <main class="seo-fallback">
+            <section>
+                <h2>Descubra as Sombras</h2>
+                <p>Ashyus cria universos onde a magia tem um preço e o romance floresce no perigo. Explore nossas obras disponíveis na Amazon Brasil e Kindle Unlimited.</p>
+            </section>
+        </main>
     </div>
     <script type="module" src="./index.tsx"></script>
   </body>

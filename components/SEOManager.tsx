@@ -1,3 +1,4 @@
+
 import React, { useEffect, useContext } from 'react';
 import { Page } from '../App';
 import { BookContext } from '../context/BookContext';
@@ -10,189 +11,81 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
     const { books, releases, authorPhoto } = useContext(BookContext);
 
     useEffect(() => {
-        // 1. Atualiza Dados Estruturados (JSON-LD)
+        const baseUrl = "https://cronicasdafantasia.com.br";
+        
         const updateSchema = () => {
-            const baseUrl = "https://www.cronicasdafantasia.com.br";
-            const schemas = [];
+            const schemas: any[] = [];
 
-            // --- Schema Global (Organization/WebSite) ---
+            // 1. Organization & Website
             schemas.push({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "Crônicas da Fantasia",
+                "name": "Ashyus Books",
+                "alternateName": "Crônicas da Fantasia",
                 "url": baseUrl,
-                "potentialAction": {
-                    "@type": "SearchAction",
-                    "target": `${baseUrl}/search?q={search_term_string}`,
-                    "query-input": "required name=search_term_string"
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Ashyus Books",
+                    "logo": { "@type": "ImageObject", "url": `${baseUrl}/logo.png` }
                 }
             });
 
-            // --- Schema de Breadcrumb (Trilha de Navegação) ---
+            // 2. Author Entity (E-E-A-T)
             schemas.push({
                 "@context": "https://schema.org",
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {
-                        "@type": "ListItem",
-                        "position": 1,
-                        "name": "Home",
-                        "item": baseUrl
-                    },
-                    ...(currentPage !== 'home' ? [{
-                        "@type": "ListItem",
-                        "position": 2,
-                        "name": currentPage.charAt(0).toUpperCase() + currentPage.slice(1),
-                        "item": `${baseUrl}/${currentPage}`
-                    }] : [])
+                "@type": "Person",
+                "@id": `${baseUrl}/#author`,
+                "name": "Ashyus",
+                "url": `${baseUrl}/about`,
+                "image": authorPhoto,
+                "description": "Escritor brasileiro especializado em Dark Fantasy e Romance.",
+                "sameAs": [
+                    "https://www.instagram.com/cronicasdafantasia",
+                    "https://x.com/ashyusdark",
+                    "https://www.amazon.com.br/Ashyus/e/B0D6F1Z5X6"
                 ]
             });
 
-            if (currentPage === 'home') {
-                 schemas.push({
-                    "@context": "https://schema.org",
-                    "@type": "Organization",
-                    "name": "Ashyus Books",
-                    "url": baseUrl,
-                    "logo": "https://www.cronicasdafantasia.com.br/logo.png",
-                    "sameAs": [
-                        "https://www.instagram.com/cronicasdafantasia",
-                        "https://x.com/ashyusdark"
-                    ]
-                 });
-            } 
-            else if (currentPage === 'books') {
+            // 3. Page Specific Logic
+            if (currentPage === 'books') {
                 schemas.push({
                     "@context": "https://schema.org",
-                    "@type": "ItemList",
-                    "name": "Livros de Ashyus",
-                    "description": "Lista completa de livros de Dark Fantasy e Romance publicados por Ashyus.",
-                    "itemListElement": books.map((book, index) => ({
-                        "@type": "ListItem",
-                        "position": index + 1,
-                        "item": {
-                            "@type": "Book",
-                            "name": book.title,
-                            "author": {
-                                "@type": "Person",
-                                "name": "Ashyus"
-                            },
-                            "url": `${baseUrl}/books#${book.id}`,
-                            "image": book.coverUrl,
-                            "description": book.shortSynopsis,
-                            "offers": book.amazonUrl ? {
-                                "@type": "Offer",
-                                "availability": "https://schema.org/InStock",
-                                "url": book.amazonUrl,
-                                "priceCurrency": "BRL",
-                                "price": "24.90"
-                            } : undefined
-                        }
-                    }))
-                });
-            }
-            else if (currentPage === 'about') {
-                schemas.push({
-                    "@context": "https://schema.org",
-                    "@type": "Person",
-                    "name": "Ashyus",
-                    "url": baseUrl,
-                    "image": authorPhoto,
-                    "jobTitle": "Autor de Fantasia",
-                    "description": "Ashyus é um autor brasileiro de Dark Fantasy e Romance.",
-                    "sameAs": [
-                        "https://www.instagram.com/cronicasdafantasia",
-                        "https://x.com/ashyusdark",
-                        "https://amazon.com/author/ashyus"
-                    ]
-                });
-
-                schemas.push({
-                    "@context": "https://schema.org",
-                    "@type": "FAQPage",
-                    "mainEntity": [
-                        {
-                            "@type": "Question",
-                            "name": "Qual a ordem de leitura dos livros do Ashyus?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Embora a maioria dos livros possa ser lida de forma independente, recomenda-se começar pela saga principal disponível na página de Livros para entender a mitologia do universo."
+                    "@type": "CollectionPage",
+                    "name": "Biblioteca Ashyus Books",
+                    "description": "Catálogo completo de livros de fantasia sombria e romance.",
+                    "mainEntity": {
+                        "@type": "ItemList",
+                        "itemListElement": books.map((book, i) => ({
+                            "@type": "ListItem",
+                            "position": i + 1,
+                            "item": {
+                                "@type": "Book",
+                                "name": book.title,
+                                "author": { "@id": `${baseUrl}/#author` },
+                                "description": book.shortSynopsis,
+                                "image": book.coverUrl,
+                                "publisher": "Ashyus Books"
                             }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "Onde posso comprar os livros físicos?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Atualmente, os livros estão disponíveis principalmente em formato digital (eBook) na Amazon e Kindle Unlimited. Edições físicas são anunciadas em ocasiões especiais."
-                            }
-                        },
-                        {
-                            "@type": "Question",
-                            "name": "O autor é brasileiro?",
-                            "acceptedAnswer": {
-                                "@type": "Answer",
-                                "text": "Sim, Ashyus é um autor brasileiro focado no mercado de Dark Fantasy, misturando elementos da cultura local com tropos clássicos de fantasia."
-                            }
-                        }
-                    ]
-                });
-            }
-            else if (currentPage === 'blog') {
-                schemas.push({
-                    "@context": "https://schema.org",
-                    "@type": "Blog",
-                    "name": "Lançamentos e Novidades - Ashyus Books",
-                    "blogPost": [
-                        ...releases.map(release => ({
-                            "@type": "BlogPosting",
-                            "headline": `Lançamento: ${release.title}`,
-                            "image": release.imageUrl,
-                            "datePublished": new Date().toISOString(), 
-                            "author": { "@type": "Person", "name": "Ashyus" },
-                            "description": release.description
-                        })),
-                        ...books.map(book => ({
-                            "@type": "BlogPosting",
-                            "headline": `Livro Disponível: ${book.title}`,
-                            "image": book.coverUrl,
-                            "datePublished": book.createdAt,
-                            "author": { "@type": "Person", "name": "Ashyus" },
-                            "description": book.fullSynopsis
                         }))
-                    ]
+                    }
                 });
             }
 
-            const scriptId = 'dynamic-json-ld';
-            const existingScript = document.getElementById(scriptId);
-            if (existingScript) {
-                existingScript.remove();
+            const scriptId = 'json-ld-seo';
+            let script = document.getElementById(scriptId) as HTMLScriptElement;
+            if (!script) {
+                script = document.createElement('script');
+                script.id = scriptId;
+                script.type = 'application/ld+json';
+                document.head.appendChild(script);
             }
-            
-            const script = document.createElement('script');
-            script.id = scriptId;
-            script.type = 'application/ld+json';
             script.text = JSON.stringify(schemas);
-            document.head.appendChild(script);
-        };
-
-        const updateKeywords = () => {
-            const metaKeywords = document.querySelector('meta[name="keywords"]');
-            if (metaKeywords) {
-                let keys = "Ashyus Books, Dark Fantasy, Romance, Livros, Fantasia Brasileira, Kindle Unlimited";
-                if (currentPage === 'books') keys += `, ${books.map(b => b.title).join(', ')}`;
-                if (currentPage === 'blog') keys += ", Lançamentos, Novidades, Notícias Literárias, Wattpad";
-                metaKeywords.setAttribute('content', keys);
-            }
         };
 
         updateSchema();
-        updateKeywords();
-
     }, [currentPage, books, releases, authorPhoto]);
 
-    return null; 
+    return null;
 };
 
 export default SEOManager;
