@@ -1,3 +1,4 @@
+
 import React, { useContext, useState } from 'react';
 import { BookContext } from '../context/BookContext';
 
@@ -10,7 +11,7 @@ const MobileAdBanner: React.FC = () => {
     if (!isVisible || banners.length === 0) return null;
 
     // Duplicamos os banners para criar o efeito de loop infinito horizontal
-    const displayBanners = [...banners, ...banners, ...banners];
+    const displayBanners = [...banners, ...banners];
 
     return (
         <div className="xl:hidden fixed bottom-0 left-0 w-full z-40 bg-slate-900/95 backdrop-blur-md border-t border-brand-gold/30 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] animate-slide-up pb-safe">
@@ -29,8 +30,8 @@ const MobileAdBanner: React.FC = () => {
                     Parceiros
                 </p>
                 
-                {/* Container de Animação Horizontal (Marquee) */}
-                <div className="flex gap-4 w-max animate-infinite-scroll-left hover:[animation-play-state:paused] px-4">
+                {/* Container de Animação Horizontal (Marquee) - Conforme pedido: Esquerda para Direita (Right) */}
+                <div className="flex gap-4 w-max animate-infinite-scroll-right hover:[animation-play-state:paused] px-4">
                     {displayBanners.map((banner, index) => (
                         <a 
                             key={`${banner.id}-${index}`} 

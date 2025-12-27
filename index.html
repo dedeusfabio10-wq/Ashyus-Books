@@ -44,6 +44,30 @@
             colors: {
               'brand-dark': '#0f172a',
               'brand-gold': '#fbbf24',
+            },
+            keyframes: {
+              'infinite-scroll-up': {
+                from: { transform: 'translateY(0)' },
+                to: { transform: 'translateY(-50%)' },
+              },
+              'infinite-scroll-down': {
+                from: { transform: 'translateY(-50%)' },
+                to: { transform: 'translateY(0)' },
+              },
+              'infinite-scroll-left': {
+                from: { transform: 'translateX(0)' },
+                to: { transform: 'translateX(-50%)' },
+              },
+              'infinite-scroll-right': {
+                from: { transform: 'translateX(-50%)' },
+                to: { transform: 'translateX(0)' },
+              }
+            },
+            animation: {
+              'infinite-scroll-up': 'infinite-scroll-up 30s linear infinite',
+              'infinite-scroll-down': 'infinite-scroll-down 30s linear infinite',
+              'infinite-scroll-left': 'infinite-scroll-left 40s linear infinite',
+              'infinite-scroll-right': 'infinite-scroll-right 40s linear infinite',
             }
           },
         },

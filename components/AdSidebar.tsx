@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { BookContext } from '../context/BookContext';
 
@@ -16,11 +17,11 @@ const AdSidebar: React.FC<AdSidebarProps> = ({ side }) => {
 
     // Duplicamos os banners para criar um loop perfeito na animação CSS
     // Isso garante que quando o primeiro conjunto sair da tela, o segundo já esteja visível
-    const displayBanners = [...sideBanners, ...sideBanners, ...sideBanners, ...sideBanners]; 
+    const displayBanners = [...sideBanners, ...sideBanners]; 
 
     // Seleciona a animação correta baseada no lado
-    // Esquerda: sobe (scroll-up) | Direita: desce (scroll-down)
-    const animationClass = side === 'left' ? 'animate-infinite-scroll-up' : 'animate-infinite-scroll-down';
+    // Conforme pedido: Esquerda (Cima para Baixo) -> Down | Direita (Baixo para Cima) -> Up
+    const animationClass = side === 'left' ? 'animate-infinite-scroll-down' : 'animate-infinite-scroll-up';
 
     return (
         <aside className="hidden xl:flex w-[160px] 2xl:w-[200px] flex-shrink-0 pt-8 sticky top-24 h-[calc(100vh-8rem)] overflow-hidden">
