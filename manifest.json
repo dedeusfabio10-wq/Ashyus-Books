@@ -2,7 +2,7 @@
 {
   "short_name": "Ashyus",
   "name": "Crônicas da Fantasia | Ashyus Books",
-  "description": "Portal oficial do autor Ashyus. Dark Fantasy, Romance e Mistério.",
+  "description": "Explore mundos de Dark Fantasy, Romance Sombrio e Mistério no portal oficial de Ashyus.",
   "icons": [
     {
       "src": "data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230f172a' stroke='%23fbbf24' stroke-width='2'/%3E%3Cpath d='M20 75C20 75 35 82 50 78C65 82 80 75 80 75V45C80 45 65 52 50 48C35 52 20 45 20 45V75Z' fill='%23fbbf24'/%3E%3C/svg%3E",
@@ -23,5 +23,37 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "categories": ["books", "entertainment", "lifestyle"],
-  "lang": "pt-BR"
+  "lang": "pt-BR",
+  "shortcuts": [
+    {
+      "name": "Ver Livros",
+      "short_name": "Livros",
+      "description": "Acesse a biblioteca completa",
+      "url": "/books",
+      "icons": [{ "src": "data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%23fbbf24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E", "sizes": "192x192" }]
+    },
+    {
+      "name": "Lançamentos",
+      "short_name": "Novidades",
+      "description": "Veja o que há de novo",
+      "url": "/blog",
+      "icons": [{ "src": "data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%23fbbf24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'/%3E%3C/svg%3E", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://picsum.photos/seed/ashyus_mobile/540/1170?grayscale",
+      "sizes": "540x1170",
+      "type": "image/jpg",
+      "form_factor": "narrow",
+      "label": "Interface mobile elegante"
+    },
+    {
+      "src": "https://picsum.photos/seed/ashyus_desktop/1920/1080?grayscale",
+      "sizes": "1920x1080",
+      "type": "image/jpg",
+      "form_factor": "wide",
+      "label": "Versão desktop imersiva"
+    }
+  ]
 }

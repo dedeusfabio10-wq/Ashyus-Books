@@ -1,5 +1,5 @@
 
-import React, { useState, MouseEvent } from 'react';
+import React, { useState, MouseEvent, useEffect } from 'react';
 import { Page, HolidayTheme } from '../App';
 import Logo from './Logo';
 
@@ -35,6 +35,29 @@ const NavLink: React.FC<{ page: Page; currentPage: Page; setCurrentPage: (page: 
 const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage, onAdminClick, holidayTheme = 'normal' }) => {
     const [clickCount, setClickCount] = useState(0);
     const [lastClick, setLastClick] = useState(0);
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [showInstallBtn, setShowInstallBtn] = useState(false);
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e: any) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setShowInstallBtn(true);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            setShowInstallBtn(false);
+        }
+        setDeferredPrompt(null);
+    };
 
     const handleTitleClick = (event: MouseEvent<HTMLDivElement>) => {
         const now = Date.now();
@@ -65,11 +88,22 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage, onAdminCli
                             </span>
                         </div>
                     </div>
+                    
                     <nav className="flex items-center space-x-1 md:space-x-2" role="navigation" aria-label="Menu Principal">
                         <NavLink page="home" currentPage={currentPage} setCurrentPage={setCurrentPage}>Home</NavLink>
                         <NavLink page="books" currentPage={currentPage} setCurrentPage={setCurrentPage}>Livros</NavLink>
                         <NavLink page="about" currentPage={currentPage} setCurrentPage={setCurrentPage}>Sobre</NavLink>
                         <NavLink page="blog" currentPage={currentPage} setCurrentPage={setCurrentPage}>Lançamentos</NavLink>
+                        
+                        {showInstallBtn && (
+                            <button 
+                                onClick={handleInstallClick}
+                                className="ml-2 bg-brand-gold/10 border border-brand-gold/50 text-brand-gold px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 hover:bg-brand-gold hover:text-brand-dark transition-all animate-pulse"
+                            >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span className="hidden sm:inline">Instalar App</span>
+                            </button>
+                        )}
                     </nav>
                 </div>
             </div>

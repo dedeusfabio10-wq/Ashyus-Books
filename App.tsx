@@ -30,15 +30,6 @@ const pageTitles = {
     terms: 'Termos de Uso | Crônicas da Fantasia',
 }
 
-const pageDescriptions = {
-    home: "Portal oficial do autor Ashyus. Explore best-sellers de Dark Fantasy, Romance Sombrio e Mistério. Entre no reino onde a luz e a sombra colidem.",
-    books: "Leia sinopses completas, primeiros capítulos gratuitos e compre os livros da saga Crônicas da Fantasia. Disponível na Amazon e Kindle Unlimited.",
-    about: "Conheça a história de Ashyus, o autor brasileiro que está redefinindo a fantasia sombria com narrativas profundas e personagens inesquecíveis.",
-    blog: "Fique atualizado com as últimas notícias, das de lançamento de livros, eventos de autógrafos e contos exclusivos do blog de Ashyus.",
-    privacy: "Informações sobre como protegemos seus dados e sua privacidade ao navegar no universo de Ashyus Books.",
-    terms: "Regras e condições para uso do conteúdo e navegação no portal Crônicas da Fantasia.",
-}
-
 const App: React.FC = () => {
     const getHolidayTheme = (): HolidayTheme => {
         const now = new Date();
@@ -58,7 +49,19 @@ const App: React.FC = () => {
     const [holidayTheme, setHolidayTheme] = useState<HolidayTheme>(getHolidayTheme());
     const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
     const [showIntro, setShowIntro] = useState(true);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
     const hasInteracted = useRef(false);
+
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -117,6 +120,11 @@ const App: React.FC = () => {
             <SEOManager currentPage={currentPage} />
             {showIntro && <IntroOverlay onComplete={handleIntroComplete} />}
             <div className={`flex flex-col min-h-screen bg-transparent transition-opacity duration-1000 ${showIntro ? 'opacity-0' : 'opacity-100'} relative theme-${holidayTheme}`}>
+                {!isOnline && (
+                    <div className="bg-red-900 text-white text-[10px] py-1 text-center font-bold uppercase tracking-widest sticky top-0 z-[60] border-b border-red-500 animate-pulse">
+                        Sua conexão com o reino foi perdida. Navegando em modo sombras (Offline).
+                    </div>
+                )}
                 <AtmosphericEvents holidayTheme={holidayTheme} />
                 <Header 
                     currentPage={currentPage} 

@@ -18,7 +18,6 @@ const WizardFigure = () => (
                     <stop offset="100%" stopColor="#d97706" />
                 </radialGradient>
             </defs>
-            {/* Capuz/Silhueta */}
             <path 
                 d="M100 30 C60 30 40 70 45 110 L30 180 L170 180 L155 110 C160 70 140 30 100 30Z" 
                 fill="#020617" 
@@ -26,12 +25,10 @@ const WizardFigure = () => (
                 strokeWidth="0.5"
                 className="drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]"
             />
-            {/* Sombra interna do capuz */}
             <path 
                 d="M60 85 Q100 65 140 85 Q140 120 100 130 Q60 120 60 85" 
                 fill="#000" 
             />
-            {/* Olhos Brilhantes */}
             <g className="animate-pulse">
                 <circle cx="85" cy="95" r="2" fill="url(#wizardEyes)">
                     <animate attributeName="r" values="1.5;2.5;1.5" dur="3s" repeatCount="indefinite" />
@@ -40,7 +37,6 @@ const WizardFigure = () => (
                     <animate attributeName="r" values="1.5;2.5;1.5" dur="3s" repeatCount="indefinite" />
                 </circle>
             </g>
-            {/* Detalhes de fumaça/magia */}
             <path 
                 d="M50 180 Q30 140 50 100 M150 180 Q170 140 150 100" 
                 stroke="#fbbf24" 
@@ -59,11 +55,13 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onComplete }) => {
     const [refusalCount, setRefusalCount] = useState(0);
 
     useEffect(() => {
-        // Auto-completar intro para rastreadores de anúncios e bots de busca
+        // Detecção ultra-robusta de rastreadores (Bots)
         const userAgent = window.navigator.userAgent.toLowerCase();
-        const isBot = /bot|google|adsense|crawler|spider|robot|crawling/i.test(userAgent);
+        const botKeywords = ['bot', 'google', 'adsense', 'crawler', 'spider', 'robot', 'crawling', 'lighthouse', 'mediapartners'];
+        const isBot = botKeywords.some(keyword => userAgent.includes(keyword));
         
         if (isBot) {
+            console.log("Robô detectado, saltando introdução para AdSense...");
             setIsVisible(false);
             onComplete();
         }
@@ -95,11 +93,14 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onComplete }) => {
         }
     };
 
+    // Para o AdSense não considerar a tela como "sem conteúdo", usamos um rendering condicional
+    // mas mantemos os elementos no DOM se for um bot (embora o useEffect acima já resolva a maioria)
     if (!isVisible) return null;
 
     return (
         <div 
             className={`fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-1000 overflow-hidden ${stage === 'exiting' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            aria-label="Bem-vindo às Crônicas da Fantasia"
         >
             <div className={`absolute inset-0 bg-slate-900/50 transition-opacity duration-1000 ${stage === 'wizard' ? 'opacity-90' : 'opacity-60'}`}></div>
 
