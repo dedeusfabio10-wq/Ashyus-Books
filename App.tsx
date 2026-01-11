@@ -41,7 +41,8 @@ const App: React.FC = () => {
     };
 
     const [currentPage, setCurrentPage] = useState<Page>(() => {
-        const path = window.location.pathname.replace('/', '');
+        // Roteamento mais robusto que limpa barras iniciais e finais
+        const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
         if (['books', 'about', 'blog', 'privacy', 'terms'].includes(path)) return path as Page;
         return 'home';
     });
@@ -83,7 +84,7 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const handlePopState = () => {
-            const path = window.location.pathname.replace('/', '');
+            const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
             setCurrentPage((path as Page) || 'home');
         };
         window.addEventListener('popstate', handlePopState);
