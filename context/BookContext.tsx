@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Book, Banner, Release } from '../types';
 import { supabase } from '../services/supabaseClient';
+import { INITIAL_BOOKS } from '../constants';
 
 interface BookContextType {
     books: Book[];
@@ -11,9 +12,9 @@ interface BookContextType {
     loading: boolean;
     error: string | null;
     addBook: (
-        title: string, 
-        books2readUrl: string, 
-        amazonUrl: string | undefined, 
+        title: string,
+        books2readUrl: string,
+        amazonUrl: string | undefined,
         amazonEbookUrl: string | undefined,
         draftBookUrl: string | undefined,
         coverBase64: string | undefined,
@@ -40,14 +41,14 @@ export const BookContext = createContext<BookContextType>({
     authorPhoto: DEFAULT_AUTHOR_PHOTO,
     loading: true,
     error: null,
-    addBook: async () => {},
-    updateBook: async () => {},
-    updateBookCover: async () => {},
-    addBanner: async () => {},
-    removeBanner: async () => {},
-    addRelease: async () => {},
-    removeRelease: async () => {},
-    updateAuthorPhoto: async () => {},
+    addBook: async () => { },
+    updateBook: async () => { },
+    updateBookCover: async () => { },
+    addBanner: async () => { },
+    removeBanner: async () => { },
+    addRelease: async () => { },
+    removeRelease: async () => { },
+    updateAuthorPhoto: async () => { },
     isInitialized: false,
 });
 
@@ -79,8 +80,16 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (bError) throw bError;
 
+
+
+            // ... (imports)
+
+            // ... inside loadData function ...
+
+            let finalBooks: Book[] = [];
+
             if (bData) {
-                setBooks(bData.map((b: any) => ({
+                finalBooks = bData.map((b: any) => ({
                     id: b.id,
                     title: b.title,
                     books2readUrl: b.books2read_url || '',
@@ -92,8 +101,20 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     fullSynopsis: b.full_synopsis || '',
                     firstChapterMarkdown: b.first_chapter_markdown || '',
                     createdAt: b.created_at
-                })));
+                }));
             }
+
+            // Merge with INITIAL_BOOKS if they don't exist in DB (by title)
+            const dbTitles = new Set(finalBooks.map(b => b.title.toLowerCase()));
+            const missingStaticBooks = INITIAL_BOOKS.filter(ib => !dbTitles.has(ib.title.toLowerCase())).map(ib => ({
+                ...ib,
+                id: `static-${Date.now()}-${Math.random()}` // Ensure unique ID for UI
+            }));
+
+            // Combine and Sort
+            setBooks([...finalBooks, ...missingStaticBooks].sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            ));
 
             // 2. Carrega Banners
             const { data: banData } = await supabase.from('banners').select('*');
@@ -208,10 +229,10 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     return (
-        <BookContext.Provider value={{ 
-            books, banners, releases, authorPhoto, loading, error, 
-            addBook, updateBook, updateBookCover, addBanner, removeBanner, 
-            addRelease, removeRelease, updateAuthorPhoto, isInitialized 
+        <BookContext.Provider value={{
+            books, banners, releases, authorPhoto, loading, error,
+            addBook, updateBook, updateBookCover, addBanner, removeBanner,
+            addRelease, removeRelease, updateAuthorPhoto, isInitialized
         }}>
             {children}
         </BookContext.Provider>
