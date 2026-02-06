@@ -64,7 +64,14 @@ const SEOManager: React.FC<SEOManagerProps> = ({ currentPage }) => {
                                 "author": { "@id": `${baseUrl}/#author` },
                                 "description": book.shortSynopsis,
                                 "image": book.coverUrl,
-                                "publisher": "Ashyus Books"
+                                "publisher": "Ashyus Books",
+                                "offers": {
+                                    "@type": "Offer",
+                                    "availability": "https://schema.org/InStock",
+                                    "price": "0.00",
+                                    "priceCurrency": "BRL",
+                                    "url": book.amazonUrl || book.amazonEbookUrl || "https://www.amazon.com.br/s?k=ashyus"
+                                }
                             }
                         }))
                     }

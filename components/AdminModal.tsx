@@ -2,6 +2,7 @@
 import React, { useState, useContext, FormEvent } from 'react';
 import { BookContext } from '../context/BookContext';
 import { ADMIN_USERNAME, ADMIN_PASSWORD } from '../constants';
+import { generateBookDetails } from '../services/geminiService';
 import { Book } from '../types';
 import Loader from './Loader';
 
@@ -23,7 +24,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
-    
+
     // Book State
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
@@ -50,12 +51,15 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
     const [releaseDesc, setReleaseDesc] = useState('');
     const [releaseImage, setReleaseImage] = useState<string | null>(null);
 
+    // AI State
+    const [isGenerating, setIsGenerating] = useState(false);
+
     const [activeTab, setActiveTab] = useState<'add' | 'edit' | 'ads' | 'releases' | 'author'>('add');
-    
-    const { 
-        books, banners, releases, authorPhoto, 
-        addBook, updateBook, updateBookCover, addBanner, removeBanner, 
-        addRelease, removeRelease, updateAuthorPhoto, loading 
+
+    const {
+        books, banners, releases, authorPhoto,
+        addBook, updateBook, updateBookCover, addBanner, removeBanner,
+        addRelease, removeRelease, updateAuthorPhoto, loading
     } = useContext(BookContext);
 
     const handleLogin = (e: FormEvent) => {
@@ -123,12 +127,28 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
         setEditingCoverPreview(book.coverUrl);
     };
 
+    const handleAIGeneration = async () => {
+        if (!title) return alert("Por favor, insira um título primeiro para invocar a inspiração.");
+        setIsGenerating(true);
+        try {
+            const data = await generateBookDetails(title);
+            setShortSynopsis(data.shortSynopsis);
+            setFullSynopsis(data.fullSynopsis);
+            setFirstChapter(data.firstChapterMarkdown);
+            alert("✨ Inspiração recebida! Detalhes preenchidos magicamente.");
+        } catch (error) {
+            alert("Falha ao invocar a IA: " + (error as Error).message);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in" onClick={onClose}>
             <div className="bg-brand-darker rounded-lg shadow-2xl border border-gray-700 w-full max-w-5xl m-4 p-8 relative animate-slide-up max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors text-2xl leading-none">&times;</button>
                 <h2 className="font-serif text-2xl text-brand-gold mb-6 text-center">Painel de Administração</h2>
-                
+
                 {!isLoggedIn ? (
                     <form onSubmit={handleLogin} className="max-w-sm mx-auto">
                         <div className="space-y-4">
@@ -155,7 +175,7 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
                                 {/* Coluna Esquerda: Capa e Links */}
                                 <div className="space-y-4">
                                     <h3 className="text-brand-gold font-bold border-b border-gray-700 pb-2">{editingBookId ? 'Editar Capa' : 'Capa da Obra'}</h3>
-                                    
+
                                     {/* Preview da Capa */}
                                     <div className="aspect-[2/3] bg-black/40 border-2 border-dashed border-gray-700 rounded-lg flex items-center justify-center overflow-hidden relative group">
                                         {(editingCoverPreview || coverImage) ? (
@@ -193,20 +213,69 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
                                         </ul>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-2 p-3 bg-black/20 rounded-lg border border-white/5">
-                                        <p className="text-[10px] uppercase tracking-widest text-brand-gold font-bold">Canais de Venda</p>
-                                        <input type="url" placeholder="Amazon (Físico)" value={amazonUrl} onChange={e => setAmazonUrl(e.target.value)} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-[11px]" />
-                                        <input type="url" placeholder="Amazon (eBook)" value={amazonEbookUrl} onChange={e => setAmazonEbookUrl(e.target.value)} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-[11px]" />
-                                        <input type="url" placeholder="Draft" value={draftBookUrl} onChange={e => setDraftBookUrl(e.target.value)} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-[11px]" />
-                                        <input type="url" placeholder="Books2Read" value={url} onChange={e => setUrl(e.target.value)} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-[11px]" required />
+                                    <div className="grid grid-cols-1 gap-3 p-4 bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg border border-white/10 shadow-inner">
+                                        <p className="text-[10px] uppercase tracking-widest text-brand-gold font-bold flex items-center gap-2">
+                                            <span>🛒 Canais de Venda</span>
+                                            <span className="h-px bg-brand-gold/20 flex-grow"></span>
+                                        </p>
+
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 text-xs">📦</span>
+                                            </div>
+                                            <input type="url" placeholder="Link Amazon (Livro Físico)" value={amazonUrl} onChange={e => setAmazonUrl(e.target.value)} className="w-full bg-black/40 border border-gray-600 rounded-md pl-8 pr-3 py-2 text-white text-xs focus:ring-1 focus:ring-brand-gold focus:border-brand-gold transition-all" />
+                                        </div>
+
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 text-xs">📱</span>
+                                            </div>
+                                            <input type="url" placeholder="Link Kindle (eBook)" value={amazonEbookUrl} onChange={e => setAmazonEbookUrl(e.target.value)} className="w-full bg-black/40 border border-gray-600 rounded-md pl-8 pr-3 py-2 text-white text-xs focus:ring-1 focus:ring-brand-gold focus:border-brand-gold transition-all" />
+                                        </div>
+
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 text-xs">📝</span>
+                                            </div>
+                                            <input type="url" placeholder="Link Draft2Digital" value={draftBookUrl} onChange={e => setDraftBookUrl(e.target.value)} className="w-full bg-black/40 border border-gray-600 rounded-md pl-8 pr-3 py-2 text-white text-xs focus:ring-1 focus:ring-brand-gold focus:border-brand-gold transition-all" />
+                                        </div>
+
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 text-xs">🔗</span>
+                                            </div>
+                                            <input type="url" placeholder="Link Books2Read (Universal)" value={url} onChange={e => setUrl(e.target.value)} className="w-full bg-black/40 border border-gray-600 rounded-md pl-8 pr-3 py-2 text-white text-xs focus:ring-1 focus:ring-brand-gold focus:border-brand-gold transition-all" required />
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Coluna Meio e Direita: Conteúdo */}
                                 <div className="md:col-span-2 space-y-4">
                                     <h3 className="text-brand-gold font-bold border-b border-gray-700 pb-2">{editingBookId ? 'Editando: ' + title : 'Textos da Obra'}</h3>
-                                    <input type="text" placeholder="Título" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white font-serif text-lg" required />
-                                    
+
+                                    <div className="flex gap-2">
+                                        <input type="text" placeholder="Título da Obra" value={title} onChange={e => setTitle(e.target.value)} className="flex-grow bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white font-serif text-lg focus:border-brand-gold outline-none transition-colors" required />
+                                        <button
+                                            type="button"
+                                            onClick={handleAIGeneration}
+                                            disabled={isGenerating || !title}
+                                            className={`px-4 py-2 rounded font-bold text-xs uppercase tracking-wide flex items-center gap-2 transition-all shadow-lg ${isGenerating || !title ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-purple-900/50 text-purple-300 border border-purple-500/50 hover:bg-purple-900 hover:text-white hover:border-purple-400 hover:shadow-purple-900/20'}`}
+                                            title="Preencher Sinopses e Capítulo com IA"
+                                        >
+                                            {isGenerating ? (
+                                                <>
+                                                    <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                                                    <span>Criando...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>🔮</span>
+                                                    <span>Invocar IA</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-4">
                                             <textarea value={shortSynopsis} onChange={e => setShortSynopsis(e.target.value)} placeholder="Sinopse Curta (Exibida no card)..." className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white h-24 text-sm" required />
@@ -230,8 +299,8 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
                         )}
 
                         {!loading && activeTab === 'edit' && !editingBookId && (
-                             <div className="animate-fade-in space-y-3">
-                                {books.length === 0 ? <p className="text-center text-gray-500 py-10">Nenhum livro cadastrado.</p> : 
+                            <div className="animate-fade-in space-y-3">
+                                {books.length === 0 ? <p className="text-center text-gray-500 py-10">Nenhum livro cadastrado.</p> :
                                     books.map(book => (
                                         <div key={book.id} className="flex items-center gap-4 bg-gray-800 p-4 rounded-lg border border-white/5 hover:border-brand-gold/30 transition-all">
                                             <img src={book.coverUrl} className="w-12 h-18 object-cover rounded shadow-lg" />
@@ -326,11 +395,11 @@ const AdminModal: React.FC<AdminModalProps> = ({ onClose }) => {
                                     </div>
                                 </div>
                                 <div className="max-w-xs w-full text-center">
-                                    <p className="text-gray-400 text-xs mb-4">Esta foto é usada no site e nos metadados de SEO.<br/>Use uma foto quadrada (1:1) de até 200kb.</p>
-                                    <input 
-                                        type="file" 
-                                        accept="image/*" 
-                                        onChange={async e => e.target.files && updateAuthorPhoto(await fileToBase64(e.target.files[0]))} 
+                                    <p className="text-gray-400 text-xs mb-4">Esta foto é usada no site e nos metadados de SEO.<br />Use uma foto quadrada (1:1) de até 200kb.</p>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={async e => e.target.files && updateAuthorPhoto(await fileToBase64(e.target.files[0]))}
                                         className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-gold file:text-brand-dark hover:file:bg-brand-gold-dark cursor-pointer"
                                     />
                                 </div>
