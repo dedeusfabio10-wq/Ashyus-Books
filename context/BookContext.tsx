@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Book, Banner, Release } from '../types';
 import { supabase } from '../services/supabaseClient';
-import { INITIAL_BOOKS } from '../constants';
+import { INITIAL_BOOKS, INITIAL_RELEASES } from '../constants';
 
 interface BookContextType {
     books: Book[];
@@ -80,12 +80,6 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (bError) throw bError;
 
-
-
-            // ... (imports)
-
-            // ... inside loadData function ...
-
             let finalBooks: Book[] = [];
 
             if (bData) {
@@ -126,11 +120,23 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             // 3. Carrega Lançamentos
             const { data: relData } = await supabase.from('releases').select('*').order('created_at', { ascending: false });
+
+            let finalReleases: Release[] = [];
+
             if (relData) {
-                setReleases(relData.map((r: any) => ({
+                finalReleases = relData.map((r: any) => ({
                     id: r.id, title: r.title, description: r.description, date: r.date_text, imageUrl: r.image_url
-                })));
+                }));
             }
+
+            // Merge with INITIAL_RELEASES
+            const dbReleaseTitles = new Set(finalReleases.map(r => r.title.toLowerCase()));
+            const missingStaticReleases = INITIAL_RELEASES.filter(ir => !dbReleaseTitles.has(ir.title.toLowerCase())).map(ir => ({
+                ...ir,
+                id: `static-release-${Date.now()}-${Math.random()}`
+            }));
+
+            setReleases([...finalReleases, ...missingStaticReleases]);
 
             // 4. Foto do Autor
             const { data: sData } = await supabase.from('site_settings').select('value').eq('key', 'author_photo').maybeSingle();
